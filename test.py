@@ -29,7 +29,7 @@ def main():
 	print "Soldiers:", Soldier.soldierCount
 
 	us1.observe()
-	#US soldier attack taliban 10 times (simple 50% chance of hitting)
+	#US soldier attack taliban 10 times 
 	for x in xrange(1,10):
 		us1.attack(t1, 80)
 		t1.displaySoldier()
