@@ -19,20 +19,14 @@ def main():
 	print "Soldiers:", Soldier.soldierCount
 	
 	# (self, name, team posx, posy, orientation, suppression, hits, test):
-	us1 = USrifleman("us1", "blue", 50, 100, 1, 0, 0, "USrifleman")
+	us1 = USrifleman("us1", "blue", 50, 100, 1, 0)
 	us1.displaySoldier()
-	print "Soldiers:", Soldier.soldierCount
 
 	# (self, name, posx, posy, orientation, suppression, hits, test):
-	t1 = TalibanRifleman("t1", "red", 70, 1, 6, 0, 0, "TalibanRifleman")
+	t1 = TalibanRifleman("t1", "red", 70, 1, 6, 0)
 	t1.displaySoldier()
-	print "Soldiers:", Soldier.soldierCount
 
 	us1.observe()
-	#US soldier attack taliban 10 times 
-	for x in xrange(1,10):
-		us1.attack(t1, 80)
-		t1.displaySoldier()
 
 	
 if  __name__ =='__main__':main()

@@ -5,10 +5,10 @@ from soldier import Soldier
 class USrifleman(Soldier):
 	'USrifleman with M16'
 
-	def __init__(self, name, team, posx, posy, orientation, suppression, hits, test):
+	def __init__(self, name, team, posx, posy, orientation, aggression):
 		# subclass specific arguments go here
-		Soldier.__init__(self, name, team, posx, posy, orientation, suppression, hits)
-		self.test = test
+		Soldier.__init__(self, name, team, posx, posy, orientation, aggression)
+		
 
 	def observe(self):
 		Soldier.observe(self)
@@ -24,5 +24,5 @@ class USrifleman(Soldier):
 
 	def displaySoldier(self):
 		Soldier.displaySoldier(self)
-		print "\ttest: ",self.test
+
 
