@@ -36,6 +36,12 @@ class Soldier:
 			enemy.suppression += 10
 
 	def observe(self):
+		#decrement suppression
+		self.suppression -= 5
+
+		#reset enemy list
+		self.enemyList = []
+		
 		print self.name + " Observing at orientation " + str(self.orientation) 
 
 		point1 = [self.posx, self.posy]
