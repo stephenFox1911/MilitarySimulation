@@ -20,6 +20,7 @@ class Soldier:
 		self.state = "Neutral"
 		self.coverQuality = 0
 		self.currentAction = "None"
+		self.hits = 0
 		self.enemyList = []
 		Soldier.soldierCount += 1
 		Soldier.soldiers.append(self)
@@ -29,12 +30,14 @@ class Soldier:
 		hit = randint(0,100) + shotMod
 		if hit > 100:
 			print "successful hit"
+			enemy.hits += 1
 		else:
 			print "shot misses"
 			enemy.suppression += 10
 
 	def observe(self):
-		print "Observing"
+		print self.name + " Observing at orientation " + str(self.orientation) 
+
 		point1 = [self.posx, self.posy]
 		point2 = [self.posx, self.posy]
 
@@ -80,14 +83,14 @@ class Soldier:
 					for s in Soldier.soldiers:
 						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
 							self.enemyList.append(s)
-							print("Found enemy: " + s.name)
+							print("Found enemy: " + s.name + " AT: " + str(x) + " " + str(y))
 
-					for y in xrange(point1[1],point2[1]):
-						x = point2[0]
-						for s in Soldier.soldiers:
-							if (s.posx == x) & (s.posy == y) & (s.team != self.team):
-								self.enemyList.append(s)
-								print("Found enemy: " + s.name)
+				for y in xrange(point1[1],point2[1]):
+					x = point2[0]
+					for s in Soldier.soldiers:
+						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+							self.enemyList.append(s)
+							print("Found enemy: " + s.name + " AT: " + str(x) + " " + str(y))
 
 		elif self.orientation == 2:
 			while point1[0] <= 100:
@@ -246,23 +249,18 @@ class Soldier:
 		#This step should be happening every "round", so go ahead and decrease suppression
 		self.suppression -= 5
 		# Higher numbers represent the "more aggressive" decision
-		decisionInt = randint(0,100) + self.aggression - suppression
+		decisionInt = randint(0,100) + self.aggression - self.suppression
 		
 		if self.state == "Neutral" :			
 			# 30% chance that the soldier chooses to attack (before modifiers)
 			if decisionInt >= 66 & len(self.enemyList) > 0 :
-				print "Engage"
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
 			# 30% chance (or 60% if no targets)
 			elif decisionInt >= 33 :
-				print "Moving"
 				self.state = "Move"
-				if self.suppression <= 10 :
-					self.currentAction = "Run"
-				else :
-					self.currentAction = "Crawl"
+				self.currentAction = "Move"
 					
 			else :
 				self.state = "Cover"
@@ -271,18 +269,13 @@ class Soldier:
 		elif self.state == "Cover" :
 			# 30% chance that the soldier chooses to attack (before modifiers)
 			if decisionInt >= 66 & len(self.enemyList) > 0 :
-				print "Engage"
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
 			# 30% chance (or 60% if no targets)
 			elif decisionInt >= 33 :
-				print "Moving"
 				self.state = "Move"
-				if self.suppression <= 10 :
-					self.currentAction = "Run"
-				else :
-					self.currentAction = "Crawl"
+				self.currentAction = "Move"
 					
 			else :
 				self.state = "Cover"
@@ -291,19 +284,13 @@ class Soldier:
 		elif self.state == "Engage" :
 			# 30% chance that the soldier chooses to attack (before modifiers)
 			if decisionInt >= 66 & len(self.enemyList) > 0 :
-				print "Engage"
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
 			# 30% chance (or 60% if no targets)
 			elif decisionInt >= 33 :
-				print "Moving"
 				self.state = "Move"
-				if self.suppression <= 10 :
-					self.currentAction = "Run"
-				else :
-					self.currentAction = "Crawl"
-					
+				self.currentAction = "Move"					
 			else :
 				self.state = "Cover"
 				self.currentAction = "Cover"
@@ -311,13 +298,11 @@ class Soldier:
 		elif self.state == "Move" :
 			# 10% chance that the soldier chooses to attack (before modifiers)
 			if decisionInt >= 90 & len(self.enemyList) > 0 :
-				print "Engage"
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
 			# 10% chance (or 60% if no targets)
 			elif decisionInt <= 10 :
-				print "Cover"
 				self.state = "Cover"
 				self.currentAction = "Cover"
 					
@@ -327,7 +312,8 @@ class Soldier:
 				
 	def act(self):
 		if self.currentAction == "SimpleAttack" :
-			print "Simple Attack"
+			print self.name + " Simple Attack"
+			self.coverQuality -= 10
 			#Finds target with least amount of cover and fires one shot
 			target = None
 			worstCover = 1000
@@ -339,19 +325,15 @@ class Soldier:
 			#Attack enemy once
 			shotQuality = 50
 			self.attack(target, shotQuality)
-		
-		elif self.currentAction == "Run" :
-			print "Running"
-			
-		elif self.currentAction == "Crawl" :
-			print "Crawling"
-		
-		elif self.currentAction == "Cover" :
-			print "Taking Cover"
-			
-	def displayCount(self):
-		print "Total Soldier %d" % Soldier.soldierCount
 
+		elif self.currentAction == "Move" :
+			print self.name + " Move"
+			self.coverQuality = 0
+			self.orientation = randint(0,7)
+
+		elif self.currentAction == "Cover" :
+			print self.name + " Taking Cover"
+			self.coverQuality = 30
+			
 	def displaySoldier(self):
 		print "Name: ", self.name,  ", Position:(", self.posx, ",", self.posy, "), orientation:", self.orientation
-

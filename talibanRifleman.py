@@ -12,15 +12,12 @@ class TalibanRifleman(Soldier):
 
 	def observe(self):
 		Soldier.observe(self)
-		print "TalibanRifleman observe"
 
 	def decide(self):
 		Soldier.decide(self)
-		print "TalibanRifleman Deciding"
 	
 	def act(self):
 		Soldier.act(self)
-		print "TalibanRifleman acting"
 
 	def displaySoldier(self):
 		Soldier.displaySoldier(self)

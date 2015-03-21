@@ -12,15 +12,12 @@ class USrifleman(Soldier):
 
 	def observe(self):
 		Soldier.observe(self)
-		print "USrifleman observe"
 
 	def decide(self):
 		Soldier.decide(self)
-		print "USrifleman Deciding"
 	
 	def act(self):
 		Soldier.act(self)
-		print "USrifleman acting"
 
 	def displaySoldier(self):
 		Soldier.displaySoldier(self)
