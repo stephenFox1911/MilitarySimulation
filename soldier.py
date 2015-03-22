@@ -23,13 +23,13 @@ class Soldier:
          print "shot misses"
 
    def observe(self):
-      print "Observing"
+      print name + "is observing"
 
    def decide(self):
-      print "Deciding"
+      print name + "is deciding"
 
    def act(self):
-      print "acting"
+      print name + "is acting"
    
    def displayCount(self):
       print "Total Soldier %d" % Soldier.soldierCount
