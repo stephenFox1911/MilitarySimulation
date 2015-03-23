@@ -2,47 +2,13 @@
 from random import randint
 
 class Soldier:
-<<<<<<< HEAD
 	'Common base class for all soldiers'
 	soldierCount = 0
 	#list of all soldiers
 	soldiers = []
-=======
-   'Common base class for all soldiers'
-   soldierCount = 0
 
-   def __init__(self, name, posx, posy, orientation, suppression, hits):
-      self.name = name
-      self.posx = posx
-      self.posy = posy
-      self.orientation = orientation
-      self.suppression = suppression
-      self.hits = hits
-      Soldier.soldierCount += 1
-
-   def attack(self, enemy):
-      hit = randint(0,100)
-      if hit > 50:
-         print "successful hit"
-         enemy.hits += 1
-      else:
-         print "shot misses"
-
-   def observe(self):
-      print name + "is observing"
-
-   def decide(self):
-      print name + "is deciding"
-
-   def act(self):
-      print name + "is acting"
-   
-   def displayCount(self):
-      print "Total Soldier %d" % Soldier.soldierCount
-
-   def displaySoldier(self):
-      print "Name: ", self.name,  ", Position:(", self.posx, ",", self.posy, "), orientation:", self.orientation, "hits:", self.hits
->>>>>>> AddGUI
+	'Common base class for all soldiers'
+	soldierCount = 0
 
 	def __init__(self, name, team, posx, posy, orientation, aggression):
 		self.name = name
@@ -289,8 +255,7 @@ class Soldier:
 							print("Found enemy: " + s.name)
 
 	def decide(self):
-		#This step should be happening every "round", so go ahead and decrease suppression
-		self.suppression -= 5
+		
 		# Higher numbers represent the "more aggressive" decision
 		decisionInt = randint(0,100) + self.aggression - self.suppression
 		
@@ -344,7 +309,7 @@ class Soldier:
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
-			# 10% chance (or 60% if no targets)
+			# 10% chance
 			elif decisionInt <= 10 :
 				self.state = "Cover"
 				self.currentAction = "Cover"
