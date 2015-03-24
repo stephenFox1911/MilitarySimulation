@@ -1,14 +1,3 @@
-#!/usr/bin/python
-
-# ZetCode PyGTK tutorial 
-#
-# This is a simple snake game
-# clone
-#
-# author: jan bodnar
-# website: zetcode.com 
-# last edited: February 2009
-
 import sys
 import gtk
 import cairo
@@ -19,6 +8,7 @@ from soldier import Soldier
 from usRifleman import USrifleman
 from talibanRifleman import TalibanRifleman
 import shotline
+import csv
 
 #Global Window Parameters
 WIDTH = 800
@@ -26,11 +16,12 @@ HEIGHT = 700
 
 class SimArea(gtk.DrawingArea):
 
-    def __init__(self):
+    def __init__(self, input_file):
         super(SimArea, self).__init__()
 
         #class variables
         self.inSim = False #whether or not the simulation is in progress
+        self.input_file = input_file
         self.red_combatants = [] #list of all red soldier objects
         self.blue_combatants = [] #list of all blue soldiers objects
         self.shots = [] #list of all active ShotLine objects
@@ -47,32 +38,59 @@ class SimArea(gtk.DrawingArea):
         self.set_size_request(WIDTH, HEIGHT)#TODO change according to new picture
         #event listener that determines how SimArea displays itself
         self.connect("expose-event", self.expose)
-        self.init_sim(2, 3)#TODO TEMP
+        self.init_sim()
 
     def on_timer(self):
         #called for each tick of the simulation
         if self.inSim:
             #check simulation processes
-            #self.observe() #TODO implement
-            #self.orient()
-            #self.decide() #TODO implement
-            #self.act() #TODO implement
+            self.observe()
+            self.decide()
+            self.act()
             self.move()#TODO TEMP?
             self.queue_draw() #gtk function to draw all queued actions
             return True
         else:
             return False
 
-    def init_sim(self, red, blue):
-        #initializes the simulation bby reading all data from a csv
-        #TODO reimplement to read info from csv
-        self.inSim = True
-        for i in xrange(red):
-            self.red_combatants.append(TalibanRifleman("red"+str(i), 50+i*10, 50+i*10, 0, 0, 0, "TalibanRifleman"))
-        for i in xrange(blue):
-            self.blue_combatants.append(USrifleman("blue"+str(i), 400+i*10, 400+i*10, 0, 0, 0, "USrifleman"))
+    def observe(self):
+        #TODO implement random combatant selection
+        for red in self.red_combatants:
+            red.observe()
+        for blue in self.blue_combatants:
+            blue.observe()
 
-        glib.timeout_add(10, self.on_timer)
+    def decide(self):
+        #TODO implement random combatant selection
+        for red in self.red_combatants:
+            red.decide()
+        for blue in self.blue_combatants:
+            blue.decide()
+
+    def act(self):
+        #TODO implement random combatant selection
+        for red in self.red_combatants:
+            red.act()
+        for blue in self.blue_combatants:
+            blue.act()
+
+    def init_sim(self):
+        #initializes the simulation by reading all data from a csv
+        with open(self.input_file, 'rb') as f:
+            reader = csv.reader(f)
+            input_list = list(reader)
+        self.inSim = True
+
+        for i,line in enumerate(input_list):
+            if line[0] == 'blue':
+                self.blue_combatants.append(USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4])))
+            elif line[0] == 'red':
+                self.red_combatants.append(TalibanRifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4])))
+            else:
+                print "improper csv line: "
+                print line
+
+        glib.timeout_add(100, self.on_timer) #Tick
 
     def expose(self, widget, event):
         #method to draw all objects
@@ -92,7 +110,7 @@ class SimArea(gtk.DrawingArea):
                 cr.fill() #fill border
                 cr.set_source_rgb(0, 0, 0) #set color to black
                 cr.move_to(red.posx, red.posy) #move to center of circle
-                cr.line_to(red.posx + (5*math.cos(red.orientation)), red.posy + (5*math.sin(red.orientation))) #create line from center of circle to border in direction of soldier orientation
+                cr.line_to(red.posx + (5*math.cos(red.orientation*math.pi/4)), red.posy + (5*math.sin(red.orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
                 cr.set_line_width(2)
                 cr.stroke() #draw line indicating soldier orientation
             for blue in self.blue_combatants:
@@ -104,7 +122,7 @@ class SimArea(gtk.DrawingArea):
                 cr.fill()
                 cr.set_source_rgb(0, 0, 0)
                 cr.move_to(blue.posx, blue.posy)
-                cr.line_to(blue.posx + (5*math.cos(blue.orientation)), blue.posy + (5*math.sin(blue.orientation)))
+                cr.line_to(blue.posx + (5*math.cos(blue.orientation*math.pi/4)), blue.posy + (5*math.sin(blue.orientation*math.pi/4)))
                 cr.set_line_width(2)
                 cr.stroke()
             for shot in self.shots:
@@ -224,7 +242,7 @@ class SimArea(gtk.DrawingArea):
 
 class Simulation(gtk.Window):
 
-    def __init__(self):
+    def __init__(self, input_file):
         #inherits from the gtk.Window class
         super(Simulation, self).__init__()
 
@@ -236,7 +254,7 @@ class Simulation(gtk.Window):
         self.set_position(gtk.WIN_POS_CENTER)
 
         #create a SimArea object
-        self.sim_area = SimArea()
+        self.sim_area = SimArea(input_file)
         #create a key press event listener
         self.connect("key-press-event", self.on_key_down)#TODO TEMP?
         #create a key release event listener
@@ -260,5 +278,5 @@ class Simulation(gtk.Window):
     #####TEMP METHODS?######END
 
 if __name__ == "__main__":
-    Simulation()
+    Simulation(sys.argv[1])
     gtk.main()

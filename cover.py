@@ -1,3 +1,5 @@
+import math
+
 class Cover:
     def __init__(self, nw_x, nw_y, se_x, se_y, quality, occupancy, direction, passable=True, fireable=True):
         '''
@@ -37,5 +39,24 @@ class Cover:
         '''
         @summary: determines if a shot from the given source would be flanking those using this cover
         '''
+        atan_degrees = math.atan((self.center[1]-source_y)/(self.center[0]-source_x)) * 180 / math.pi
         if self.direction == '-':
-
+            if atan_degrees >= -45 and atan_degrees <= 45:
+                return True
+            else:
+                return False
+        elif self.direction == '|':
+            if atan_degrees >= 45 and atan_degrees <= -45:
+                return True
+            else:
+                return False
+        elif self.direction == '/':
+            if atan_degrees:
+                return True
+            else:
+                return False
+        elif self.direction == '\\':
+            if atan_degrees:
+                return True
+            else:
+                return False
