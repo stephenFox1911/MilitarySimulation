@@ -345,3 +345,17 @@ class Soldier:
 			
 	def displaySoldier(self):
 		print "Name: ", self.name,  ", Position:(", self.posx, ",", self.posy, "), orientation:", self.orientation
+	
+	def findCover(self, coverList):
+		#returns the three closest pieces of cover
+		minDistances = [99999, 99998, 99997]
+		closestCover = [None, None, None]
+		
+		for c in coverList:
+			distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
+			currentMax = max(minDistances)
+			if distance < currentMax :
+				index = minDistances.index(currentMax)
+				minDistances[index] = distance
+				closestCover[index] = c
+		return closestCover
