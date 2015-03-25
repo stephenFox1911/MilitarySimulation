@@ -5,9 +5,9 @@ from soldier import Soldier
 class TalibanRifleman(Soldier):
 	'USrifleman with M16'
 
-	def __init__(self, name, team, posx, posy, orientation, aggression):
+	def __init__(self, name, team, fireteam, posx, posy, orientation, aggression):
 		# subclass specific arguments go here
-		Soldier.__init__(self, name, team, posx, posy, orientation, aggression)
+		Soldier.__init__(self, name, team, fireteam, posx, posy, orientation, aggression)
 		
 
 	def observe(self):

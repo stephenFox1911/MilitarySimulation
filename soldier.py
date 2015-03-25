@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from random import randint
+import math
 
 class Soldier:
 	'Common base class for all soldiers'
@@ -10,7 +11,7 @@ class Soldier:
 	'Common base class for all soldiers'
 	soldierCount = 0
 
-	def __init__(self, name, team, posx, posy, orientation, aggression):
+	def __init__(self, name, team, fireteam, posx, posy, orientation, aggression):
 		self.name = name
 		self.team = team
 		self.posx = posx
@@ -25,6 +26,7 @@ class Soldier:
 		self.currentAction = "None"
 		self.hits = 0
 		self.enemyList = []
+		self.closestCover = []
 		Soldier.soldierCount += 1
 		Soldier.soldiers.append(self)
 
@@ -36,6 +38,8 @@ class Soldier:
 			enemy.hits += 1
 		else:
 			print "shot misses"
+			#this needs to be mitigated by aggression somehow
+			#also modified by quality of shot
 			enemy.suppression += 10
 
 	def observe(self):
@@ -69,7 +73,7 @@ class Soldier:
 				for x in xrange(point1[0],point2[0]):
 					y = point1[1]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -90,14 +94,14 @@ class Soldier:
 				for x in xrange(point1[0],point2[0]):
 					y = point1[1]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name + " AT: " + str(x) + " " + str(y))
 
 				for y in xrange(point1[1],point2[1]):
 					x = point2[0]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name + " AT: " + str(x) + " " + str(y))
 
@@ -120,7 +124,7 @@ class Soldier:
 				for y in xrange(point1[1],point2[1]):
 					x = point1[0]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -141,14 +145,14 @@ class Soldier:
 				for x in xrange(point2[0],point1[0]):
 					y = point2[1]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
 				for y in xrange(point1[1],point2[1]):
 					x = point1[0]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -171,7 +175,7 @@ class Soldier:
 				for x in xrange(point2[0],point1[0]):
 					y = point1[1]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -192,14 +196,14 @@ class Soldier:
 				for x in xrange(point2[0],point1[0]):
 					y = point2[1]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
 				for y in xrange(point2[1],point1[1]):
 					x = point1[0]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -222,7 +226,7 @@ class Soldier:
 				for y in xrange(point2[1],point1[1]):
 					x = point1[0]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -243,14 +247,14 @@ class Soldier:
 				for x in xrange(point1[0],point2[0]):
 					y = point2[1]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
 				for y in xrange(point2[1],point1[1]):
 					x = point1[0]
 					for s in Soldier.soldiers:
-						if (s.posx == x) & (s.posy == y) & (s.team != self.team):
+						if (s.posx == x) and (s.posy == y) and (s.team != self.team):
 							self.enemyList.append(s)
 							print("Found enemy: " + s.name)
 
@@ -261,7 +265,7 @@ class Soldier:
 		
 		if self.state == "Neutral" :			
 			# 30% chance that the soldier chooses to attack (before modifiers)
-			if decisionInt >= 66 & len(self.enemyList) > 0 :
+			if decisionInt >= 66 and len(self.enemyList) > 0 :
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
@@ -276,7 +280,7 @@ class Soldier:
 		
 		elif self.state == "Cover" :
 			# 30% chance that the soldier chooses to attack (before modifiers)
-			if decisionInt >= 66 & len(self.enemyList) > 0 :
+			if decisionInt >= 66 and len(self.enemyList) > 0 :
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
@@ -291,7 +295,7 @@ class Soldier:
 		
 		elif self.state == "Engage" :
 			# 30% chance that the soldier chooses to attack (before modifiers)
-			if decisionInt >= 66 & len(self.enemyList) > 0 :
+			if decisionInt >= 66 and len(self.enemyList) > 0 :
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
@@ -305,7 +309,7 @@ class Soldier:
 		
 		elif self.state == "Move" :
 			# 10% chance that the soldier chooses to attack (before modifiers)
-			if decisionInt >= 90 & len(self.enemyList) > 0 :
+			if decisionInt >= 90 and len(self.enemyList) > 0 :
 				self.state = "Engage"
 				#Logic for choosing different types of attacks goes here
 				self.currentAction = "SimpleAttack"
@@ -337,8 +341,27 @@ class Soldier:
 		elif self.currentAction == "Move" :
 			print self.name + " Move"
 			self.coverQuality = 0
-			self.orientation = randint(0,7)
-
+			coverRank = 99999
+			bestCover = None
+			#will choose cover with lowest score
+			for c in self.closestCover:
+				#get distance
+				score = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
+				score -= c.quality
+				score += 10*c.current_occupancy
+				if c.cover_available and score < coverRank:
+					bestCover = c
+			#cover decision has been made, now orient and move towards it
+			diffX = self.posx - bestCover.center[0]
+			diffY = self.posy - bestCover.center[1]
+			if (bestCover.center[0] > (self.posx + diffY)) and (bestCover.center[0] < (self.posx - diffY)) and (bestCover.center[1] < self.posy):
+				self.orientation = 0
+			elif (bestCover.center[0] > self.posx - diffY) and (bestCover.center[1] > self.posy - diffX) and (bestCover.center[0] > self.posx) and (bestCover.center[1] < self.posy):
+				self.orientation = 1
+			elif (bestCover.center[1] > self.posy - diffY) and (bestCover.center[1] < self.posy + diffY) and (bestCover.center[0] > self.posx):
+				self.orientation = 2
+			
+			
 		elif self.currentAction == "Cover" :
 			print self.name + " Taking Cover"
 			self.coverQuality = 30
@@ -349,7 +372,7 @@ class Soldier:
 	def findCover(self, coverList):
 		#returns the three closest pieces of cover
 		minDistances = [99999, 99998, 99997]
-		closestCover = [None, None, None]
+		closeCover = [None, None, None]
 		
 		for c in coverList:
 			distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
@@ -357,5 +380,5 @@ class Soldier:
 			if distance < currentMax :
 				index = minDistances.index(currentMax)
 				minDistances[index] = distance
-				closestCover[index] = c
-		return closestCover
+				closeCover[index] = c
+		self.closestCover = closeCover

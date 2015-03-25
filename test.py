@@ -3,6 +3,7 @@
 from soldier import Soldier
 from usRifleman import USrifleman
 from talibanRifleman import TalibanRifleman
+from cover import Cover
 
 def moveNorth(soldier, distance):
 	soldier.posy -= distance
@@ -15,16 +16,23 @@ def moveEast(soldier, distance):
 
 
 def main():
-
+	cover1 = Cover(1, 1, 3, 3, 50, 3, "|")
+	cover2 = Cover(48, 48, 52, 52, 50, 3, "|")
+	cover3 = Cover(95, 95, 97, 97, 50, 3, "|")
+	
+	coverList = [cover1, cover2, cover3]
+	
 	# (self, name, team, posx, posy, orientation, aggression):
-	us1 = USrifleman("us1", "blue", 90, 100, 5, 50)
+	us1 = USrifleman("us1", "blue", "b1", 90, 100, 5, 50)
 	us1.displaySoldier()
 
 	# (self, name, team, posx, posy, orientation, aggression):
-	t1 = TalibanRifleman("t1", "red", 0, 0, 6, -50)
+	t1 = TalibanRifleman("t1", "red", "r1", 0, 0, 6, -50)
 	t1.displaySoldier()
 
 	for x in xrange(0,10):
+		us1.findCover(coverList)
+		t1.findCover(coverList)
 		us1.observe()
 		us1.decide()
 		t1.observe()

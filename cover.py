@@ -19,7 +19,7 @@ class Cover:
         self.se_x = se_x
         self.se_y = se_y
         self.quality = quality
-        self.occupancy
+        self.occupancy = occupancy
         self.current_occupancy = 0
         self.passable = passable
         self.fireable = fireable
