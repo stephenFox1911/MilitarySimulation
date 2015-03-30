@@ -29,6 +29,7 @@ class Soldier:
 		self.closestCover = []
 		Soldier.soldierCount += 1
 		Soldier.soldiers.append(self)
+		self.MOVESPEED = 20
 
 	def attack(self, enemy, quality):
 		shotMod = quality - self.suppression - enemy.coverQuality
@@ -323,8 +324,13 @@ class Soldier:
 				self.currentAction = "Move"
 				
 	def act(self):
+		isShot = False
+		target = None
+		shotSuccess = False
+
 		if self.currentAction == "SimpleAttack" :
 			print self.name + " Simple Attack"
+			isShot = True
 			self.coverQuality -= 10
 			#Finds target with least amount of cover and fires one shot
 			target = None
@@ -354,17 +360,49 @@ class Soldier:
 			#cover decision has been made, now orient and move towards it
 			diffX = self.posx - bestCover.center[0]
 			diffY = self.posy - bestCover.center[1]
-			if (bestCover.center[0] > (self.posx + diffY)) and (bestCover.center[0] < (self.posx - diffY)) and (bestCover.center[1] < self.posy):
+			if (bestCover.center[0] > self.posx + diffY) and (bestCover.center[0] < self.posx - diffY) and (bestCover.center[1] < self.posy):
 				self.orientation = 0
 			elif (bestCover.center[0] > self.posx - diffY) and (bestCover.center[1] > self.posy - diffX) and (bestCover.center[0] > self.posx) and (bestCover.center[1] < self.posy):
 				self.orientation = 1
 			elif (bestCover.center[1] > self.posy - diffY) and (bestCover.center[1] < self.posy + diffY) and (bestCover.center[0] > self.posx):
 				self.orientation = 2
+			elif (bestCover.center[1] > self.posy + diffX) and (bestCover.center[0] > self.posx + diffY) and (bestCover.center[0] > self.posx) and (bestCover.center[1] > self.posy):
+				self.orientation = 3
+			elif (bestCover.center[0] > self.posx - diffY) and (bestCover.center[0] < self.posx + diffY) and (bestCover.center[1] > self.posy):
+				self.orientation = 4
+			elif (bestCover.center[0] < self.posx - diffY) and (bestCover.center[1] > self.posy - diffX) and (bestCover.center[0] < self.posx) and (bestCover.center[1] > self.posy):
+				self.orientation = 5
+			elif (bestCover.center[1] < self.posy - diffX) and (bestCover.center[1] > self.posy + diffX) and (bestCover.center[0] < self.posx):
+				self.orientation = 6
+			elif (bestCover.center[1] < self.posy + diffX) and (bestCover.center[0] < self.posx + diffY) and (bestCover.center[0] < self.posx) and (bestCover.center[1] < self.posy):
+				self.orientation = 7
 			
+			distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
+			#Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
+			#Needs to be updated to stick the soldier behind cover
+			if distance < self.MOVESPEED:
+				self.posx = bestCover.center[0]
+				self.posy = bestCover.center[1]
+			else :
+				if bestCover.center[0] > self.posx + (self.MOVESPEED/2) :
+					self.posx += self.MOVESPEED/2
+				if bestCover.center[1] > self.posy + (self.MOVESPEED/2) :
+					self.posy += self.MOVESPEED/2
 			
 		elif self.currentAction == "Cover" :
 			print self.name + " Taking Cover"
-			self.coverQuality = 30
+			#get value of cover if in use
+			inCover = False
+			for c in self.closestCover :
+				if c.in_cover(self.posx, self.posy) :
+					self.coverQuality = c.quality
+					inCover = True
+			#if there is no cover, the soldier goes prone
+			if not inCover :
+				self.coverQuality = 20
+
+		return (isShot, target, shotSuccess)
+
 			
 	def displaySoldier(self):
 		print "Name: ", self.name,  ", Position:(", self.posx, ",", self.posy, "), orientation:", self.orientation
