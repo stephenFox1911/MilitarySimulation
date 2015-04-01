@@ -7,12 +7,13 @@ import glib
 from soldier import Soldier
 from usRifleman import USrifleman
 from talibanRifleman import TalibanRifleman
-import shotline
+from shotline import ShotLine
 import csv
 
 #Global Window Parameters
 WIDTH = 800
 HEIGHT = 700
+TIME_BETWEEN_FRAMES = 100 #in milliseconds
 
 class SimArea(gtk.DrawingArea):
 
@@ -24,7 +25,11 @@ class SimArea(gtk.DrawingArea):
         self.input_file = input_file
         self.red_combatants = [] #list of all red soldier objects
         self.blue_combatants = [] #list of all blue soldiers objects
+        self.mortars = []
         self.shots = [] #list of all active ShotLine objects
+        self.mortar_shots = []
+        self.cover_objects = []
+        self.count = 0
         ######TEMP VARIABLES#####START
         self.left = False
         self.right = False
@@ -42,11 +47,13 @@ class SimArea(gtk.DrawingArea):
 
     def on_timer(self):
         #called for each tick of the simulation
+        self.count += 1
         if self.inSim:
             #check simulation processes
-            self.observe()
-            self.decide()
-            self.act()
+            # if self.count%10 == 0:
+            #     self.observe()
+            #     self.decide()
+            #     self.act()
             self.move()#TODO TEMP?
             self.queue_draw() #gtk function to draw all queued actions
             return True
@@ -59,6 +66,8 @@ class SimArea(gtk.DrawingArea):
             red.observe()
         for blue in self.blue_combatants:
             blue.observe()
+        # for mortar in self.mortars:
+        #     mortar.observe() #TODO IS THIS IMPLEMENTED
 
     def decide(self):
         #TODO implement random combatant selection
@@ -66,6 +75,8 @@ class SimArea(gtk.DrawingArea):
             red.decide()
         for blue in self.blue_combatants:
             blue.decide()
+        # for mortar in self.mortars:
+        #     mortar.decide() #TODO IS THIS IMPLEMENTED
 
     def act(self):
         #TODO implement random combatant selection
@@ -73,6 +84,8 @@ class SimArea(gtk.DrawingArea):
             red.act()
         for blue in self.blue_combatants:
             blue.act()
+        # for mortar in self.mortars:
+        #     mortar.act() #TODO IS THIS IMPLEMENTED
 
     def init_sim(self):
         #initializes the simulation by reading all data from a csv
@@ -86,11 +99,15 @@ class SimArea(gtk.DrawingArea):
                 self.blue_combatants.append(USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4])))
             elif line[0] == 'red':
                 self.red_combatants.append(TalibanRifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4])))
+            elif line[0] == 'mortar':
+                pass #TODO IMPLEMENT
+            elif line[0] == 'cover':
+                pass #TODO implement
             else:
                 print "improper csv line: "
                 print line
 
-        glib.timeout_add(100, self.on_timer) #Tick
+        glib.timeout_add(TIME_BETWEEN_FRAMES, self.on_timer) #Tick
 
     def expose(self, widget, event):
         #method to draw all objects
@@ -102,29 +119,11 @@ class SimArea(gtk.DrawingArea):
             widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
 
             for red in self.red_combatants:
-                cr.set_line_width(1) #border width
-                cr.set_source_rgb(0, 0, 0) #border color black
-                cr.arc(red.posx, red.posy, 5, 0, 2*math.pi) #border shape and position (circle)
-                cr.stroke_preserve() #draw border
-                cr.set_source_rgb(1, 0, 0) #set color to red
-                cr.fill() #fill border
-                cr.set_source_rgb(0, 0, 0) #set color to black
-                cr.move_to(red.posx, red.posy) #move to center of circle
-                cr.line_to(red.posx + (5*math.cos(red.orientation*math.pi/4)), red.posy + (5*math.sin(red.orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
-                cr.set_line_width(2)
-                cr.stroke() #draw line indicating soldier orientation
+                self.draw_red_soldiers(cr, red)
             for blue in self.blue_combatants:
-                cr.set_line_width(1)
-                cr.set_source_rgb(0, 0, 0)
-                cr.arc(blue.posx, blue.posy, 5, 0, 2*math.pi)
-                cr.stroke_preserve()
-                cr.set_source_rgb(0, 0, 1)
-                cr.fill()
-                cr.set_source_rgb(0, 0, 0)
-                cr.move_to(blue.posx, blue.posy)
-                cr.line_to(blue.posx + (5*math.cos(blue.orientation*math.pi/4)), blue.posy + (5*math.sin(blue.orientation*math.pi/4)))
-                cr.set_line_width(2)
-                cr.stroke()
+                self.draw_blue_soldiers(cr, blue)
+            for mortar in self.mortars: #TODO cheack implementation with Wayne
+                self.draw_mortars(cr, mortar)
             for shot in self.shots:
                 cr.set_line_width(2)
                 if shot.hit:
@@ -136,6 +135,29 @@ class SimArea(gtk.DrawingArea):
                 cr.stroke()
                 shot.degrade() #increases the transparency for future ticks
             self.shots = [shot for shot in self.shots if shot.alpha > 0]
+            for shot in self.mortar_shots:
+                if shot.detonate:
+                    cr.set_source_rgba(1,1,1,0.25)
+                    cr.arc(shot.posx, shot.posy, 50, 0, 2*math.pi) #TODO change 5 to proper distance -- implement in mortarshot?
+                    cr.fill()
+                    #cr.set_source_rgba(0, 0, 0, 0.25)
+                    cr.set_source_rgba(1,1,1,0.35)
+                    cr.arc(shot.posx, shot.posy, 15, 0, 2*math.pi)
+                    cr.fill()
+                    cr.set_source_rgba(1,1,1,0.6)
+                    cr.arc(shot.posx, shot.posy, 5, 0, 2*math.pi)
+                    cr.fill()
+                else:
+                    cr.set_line_width(1)
+                    cr.set_source_rgb(0,0,0)
+                    cr.arc(shot.posx, shot.posy, 3, 0, 2*math.pi)
+                    cr.stroke_preserve()
+                    cr.set_source_rgb(1,1,1)
+                    cr.fill()
+                shot.update()
+            self.mortar_shots = [shot for shot in self.mortar_shots if shot.detonation_time > 0]
+            for cover in self.cover_objects:
+                pass #TODO implement
         else:
             self.sim_over(cr)
 
@@ -206,8 +228,8 @@ class SimArea(gtk.DrawingArea):
         elif key == gtk.keysyms._1:
             b = self.blue_combatants[0]
             r = self.red_combatants[0]
-            shot = ShotLine(b.posx, b.posy, r.posx, r.posy, True)
-            self.shots.append(shot)
+            shot = MortarShot(b.posx, b.posy, 450, 450)
+            self.mortar_shots.append(shot)
         elif key == gtk.keysyms._2:
             b = self.blue_combatants[1]
             r = self.red_combatants[1]
@@ -239,6 +261,53 @@ class SimArea(gtk.DrawingArea):
         elif key == gtk.keysyms.e:
             self.rRight = False
     #####TEMP METHODS?######END
+
+    '''///////////DRAW METHODS///////////'''
+    def draw_blue_soldiers(self, cr, blue):
+        cr.set_line_width(1)
+        cr.set_source_rgb(0, 0, 0)
+        cr.arc(blue.posx, blue.posy, 5, 0, 2*math.pi)
+        cr.stroke_preserve()
+        cr.set_source_rgb(0, 0, 1)
+        cr.fill()
+        cr.set_source_rgb(0, 0, 0)
+        cr.move_to(blue.posx, blue.posy)
+        cr.line_to(blue.posx + (5*math.cos(blue.orientation*math.pi/4)), blue.posy + (5*math.sin(blue.orientation*math.pi/4)))
+        cr.set_line_width(2)
+        cr.stroke()
+    def draw_red_soldiers(self, cr, red):
+        cr.set_line_width(1) #border width
+        cr.set_source_rgb(0, 0, 0) #border color black
+        cr.arc(red.posx, red.posy, 5, 0, 2*math.pi) #border shape and position (circle)
+        cr.stroke_preserve() #draw border
+        cr.set_source_rgb(1, 0, 0) #set color to red
+        cr.fill() #fill border
+        cr.set_source_rgb(0, 0, 0) #set color to black
+        cr.move_to(red.posx, red.posy) #move to center of circle
+        cr.line_to(red.posx + (5*math.cos(red.orientation*math.pi/4)), red.posy + (5*math.sin(red.orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
+        cr.set_line_width(2)
+        cr.stroke() #draw line indicating soldier orientation
+    def draw_mortars(self, cr, mortar):
+        cr.set_line_width(1)
+        cr.set_source_rgb(0, 0, 0)
+        cr.arc(mortar.posx, mortar.posy, 5, 0, 2*math.pi)
+        cr.stroke_preserve()
+        cr.set_source_rgb(0, 0, 1)
+        cr.fill()
+        cr.set_source_rgb(0, 0, 0)
+        cr.set_line_width(2)
+        cr.move_to(mortar.posx, mortar.posy)
+        cr.line_to(mortar.posx + 5, mortar.posy)
+        cr.stroke()
+        cr.move_to(mortar.posx, mortar.posy)
+        cr.line_to(mortar.posx - 5, mortar.posy)
+        cr.stroke()
+        cr.move_to(mortar.posx, mortar.posy)
+        cr.line_to(mortar.posx, mortar.posy + 5)
+        cr.stroke()
+        cr.move_to(mortar.posx, mortar.posy)
+        cr.line_to(mortar.posx, mortar.posy - 5)
+        cr.stroke()
 
 class Simulation(gtk.Window):
 
@@ -276,6 +345,43 @@ class Simulation(gtk.Window):
         key = event.keyval
         self.sim_area.on_key_up(event)
     #####TEMP METHODS?######END
+
+class MortarShot:
+    def __init__(self, s_x, s_y, t_x, t_y):
+        '''
+        @summary: a class to hold data for each mortar shot fired
+        @param source_x: the x-coord for the source mortar
+        @param source_y: the y-coord for the source mortar
+        @param target_x: the x-coord for the target point
+        @param target_y: the y-coord for the target point
+        '''
+        self.detonate = False #whether or not the mortar shot has detonated
+        self.detonation_time = 1500 #1.5 seconds for explosion animation
+        self.posx = s_x #x-position of mortar shot
+        self.posy = s_y #y-position of mortar shot
+        self.t_x = t_x #x-position of mortar target
+        self.t_y = t_y #y-position of mortar target
+        self.time_in_air = 20000
+        dx = s_x - t_x
+        dy = s_y - t_y
+        dist = math.hypot(dx, dy)
+        ticks_in_air = self.time_in_air / TIME_BETWEEN_FRAMES
+        magnitude = dist / ticks_in_air
+        theta = math.atan2(dy, dx)
+        self.delta_x = math.cos(theta) * magnitude
+        self.delta_y = math.sin(theta) * magnitude
+
+    def update(self):
+        if not self.detonate:
+            self.posx -= self.delta_x
+            self.posy -= self.delta_y
+            self.time_in_air -= TIME_BETWEEN_FRAMES
+            if self.time_in_air <= 0:
+                self.detonate = True
+        else:
+            self.detonation_time -= TIME_BETWEEN_FRAMES
+
+
 
 if __name__ == "__main__":
     Simulation(sys.argv[1])
