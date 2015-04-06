@@ -7,9 +7,7 @@ class Soldier:
    soldierCount = 0
    #list of all soldiers
    soldiers = []
-
-   'Common base class for all soldiers'
-   soldierCount = 0
+   output = open("output.txt", "a+")
 
    def __init__(self, name, team, fireteam, posx, posy, orientation, aggression):
       self.name = name
@@ -27,18 +25,22 @@ class Soldier:
       self.hits = 0
       self.enemyList = []
       self.closestCover = []
+      self.isDead = False
       Soldier.soldierCount += 1
       Soldier.soldiers.append(self)
       self.MOVESPEED = 20
+      
 
    def attack(self, enemy, quality):
       shotMod = quality - self.suppression - enemy.coverQuality
       hit = randint(0,100) + shotMod
       if hit > 100:
          print "successful hit"
+         Soldier.output.write("successful hit \n")
          enemy.hits += 1
       else:
          print "shot misses"
+         Soldier.output.write("Shot Misses\n")
          #this needs to be mitigated by aggression somehow
          #also modified by quality of shot
          enemy.suppression += 10
@@ -49,8 +51,6 @@ class Soldier:
 
       #reset enemy list
       self.enemyList = []
-      
-      print self.name + " Observing at orientation " + str(self.orientation) 
 
       point1 = [self.posx, self.posy]
       point2 = [self.posx, self.posy]
@@ -77,6 +77,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
       elif self.orientation == 1:
          while (point2[0] < 100) | (point1[1] > 0):
@@ -97,14 +98,16 @@ class Soldier:
                for s in Soldier.soldiers:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
-                     print("Found enemy: " + s.name + " AT: " + str(x) + " " + str(y))
+                     print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
             for y in xrange(point1[1],point2[1]):
                x = point2[0]
                for s in Soldier.soldiers:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
-                     print("Found enemy: " + s.name + " AT: " + str(x) + " " + str(y))
+                     print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
       elif self.orientation == 2:
          while point1[0] <= 100:
@@ -128,6 +131,8 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
+
 
       elif self.orientation == 3:
          while (point2[1] < 100) | (point1[0] < 100):
@@ -149,6 +154,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
             for y in xrange(point1[1],point2[1]):
                x = point1[0]
@@ -156,6 +162,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
       elif self.orientation == 4:
          while point1[1] <= 100:
@@ -179,6 +186,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
       elif self.orientation == 5:
          while (point2[0] > 0) | (point1[1] < 100):
@@ -200,6 +208,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
             for y in xrange(point2[1],point1[1]):
                x = point1[0]
@@ -207,6 +216,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
       elif self.orientation == 6:
          while point1[0] >= 0:
@@ -230,6 +240,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
       elif self.orientation == 7:
          while (point2[1] > 0) | (point1[0] > 0):
@@ -251,6 +262,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
             for y in xrange(point2[1],point1[1]):
                x = point1[0]
@@ -258,6 +270,7 @@ class Soldier:
                   if (s.posx == x) and (s.posy == y) and (s.team != self.team):
                      self.enemyList.append(s)
                      print("Found enemy: " + s.name)
+                     Soldier.output.write("Found enemy: " + s.name + "\n")
 
    def decide(self):
       
@@ -266,12 +279,12 @@ class Soldier:
       
       if self.state == "Neutral" :        
          # 30% chance that the soldier chooses to attack (before modifiers)
-         if decisionInt >= 66 and len(self.enemyList) > 0 :
+         if decisionInt >= 50 and len(self.enemyList) > 0 :
             self.state = "Engage"
             #Logic for choosing different types of attacks goes here
             self.currentAction = "SimpleAttack"
          # 30% chance (or 60% if no targets)
-         elif decisionInt >= 33 :
+         elif decisionInt >= 30 :
             self.state = "Move"
             self.currentAction = "Move"
                
@@ -330,6 +343,7 @@ class Soldier:
 
       if self.currentAction == "SimpleAttack" :
          print self.name + " Simple Attack"
+
          isShot = True
          self.coverQuality -= 10
          #Finds target with least amount of cover and fires one shot
@@ -342,6 +356,7 @@ class Soldier:
          
          #Attack enemy once
          shotQuality = 50
+         Soldier.output.write("Simple Attack: TARGET: " + target.name + " \n")
          self.attack(target, shotQuality)
 
       elif self.currentAction == "Move" :
@@ -357,6 +372,7 @@ class Soldier:
             score += 10*c.current_occupancy
             if c.cover_available and score < coverRank:
                bestCover = c
+         Soldier.output.write("Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
          #cover decision has been made, now orient and move towards it
          diffX = self.posx - bestCover.center[0]
          diffY = self.posy - bestCover.center[1]
@@ -383,6 +399,9 @@ class Soldier:
          if distance < self.MOVESPEED:
             self.posx = bestCover.center[0]
             self.posy = bestCover.center[1]
+            Soldier.output.write("I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
+            self.coverQuality = bestCover.quality
+            self.state = "Cover"
          else :
             if bestCover.center[0] > self.posx + (self.MOVESPEED/2) :
                self.posx += self.MOVESPEED/2
@@ -400,12 +419,14 @@ class Soldier:
          #if there is no cover, the soldier goes prone
          if not inCover :
             self.coverQuality = 20
-
+         Soldier.output.write("Taking Cover, Quality = " + str(self.coverQuality) + "\n")
       return (isShot, target, shotSuccess)
 
          
    def displaySoldier(self):
-      print "Name: ", self.name,  ", Position:(", self.posx, ",", self.posy, "), orientation:", self.orientation
+      out = "Name: " + self.name +  ", Position:(" + str(self.posx) + "," + str(self.posy) + "), orientation:" + str(self.orientation) + "\n"
+      print out
+      Soldier.output.write(out)
    
    def findCover(self, coverList):
       #returns the three closest pieces of cover
