@@ -2,6 +2,7 @@
 
 from soldier import Soldier
 from usRifleman import USrifleman
+from usMachineGunner import USmachineGunner
 from talibanRifleman import TalibanRifleman
 from cover import Cover
 
@@ -25,7 +26,7 @@ def main():
     coverList = [cover1, cover2, cover3]
     
     # (self, name, team, posx, posy, orientation, aggression):
-    us1 = USrifleman("us1", "blue", "b1", 60, 60, 0, 50)
+    us1 = USmachineGunner("us1", "blue", "b1", 60, 60, 0, 50)
 
     # (self, name, team, posx, posy, orientation, aggression):
     t1 = TalibanRifleman("t1", "red", "r1", 60, 40, 4, -50)
