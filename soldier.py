@@ -26,6 +26,8 @@ class Soldier:
         self.hits = 0
         self.enemyList = []
         self.closestCover = []
+        self.objectiveX = 0
+        self.objectiveY = 0
         self.isDead = False
         Soldier.soldierCount += 1
         Soldier.soldiers.append(self)
@@ -34,8 +36,8 @@ class Soldier:
 
     def attack(self, enemy, quality):
         distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
-        #find a better number to modify this by
-        shotMod = quality - self.suppression - enemy.coverQuality - (distance/5)
+        #approximately 10% less likely to hit per 100 yards of distance
+        shotMod = quality - self.suppression - enemy.coverQuality - (distance/60)
         hit = randint(0,100) + shotMod
         if hit > 100:
             print "successful hit"
@@ -72,7 +74,7 @@ class Soldier:
                     point1[0] -= 1
 
                 point2[1] -= 1
-                if point2[0] == 100:
+                if point2[0] == 1127:
                     pass
                 else :
                     point2[0] += 1
@@ -87,14 +89,14 @@ class Soldier:
                             Soldier.output.write("Found enemy: " + s.name + "\n")
 
         elif self.orientation == 1:
-            while (point2[0] < 100) | (point1[1] > 0):
+            while (point2[0] < 1127) | (point1[1] > 0):
                 #update searching points
                 if point1[1] == 0:
                     pass
                 else:
                     point1[1] -= 1
 
-                if point2[0] == 100:
+                if point2[0] == 1127:
                     pass
                 else:
                     point2[0] += 1
@@ -117,7 +119,7 @@ class Soldier:
                             Soldier.output.write("Found enemy: " + s.name + "\n")
 
         elif self.orientation == 2:
-            while point1[0] <= 100:
+            while point1[0] <= 1127:
                 #update searching points
                 point1[0] += 1
                 if point1[1] == 0:
@@ -126,7 +128,7 @@ class Soldier:
                     point1[1] -= 1
 
                 point2[0] += 1
-                if point2[1] == 100:
+                if point2[1] == 846:
                     pass
                 else :
                     point2[1] += 1
@@ -142,14 +144,14 @@ class Soldier:
 
 
         elif self.orientation == 3:
-            while (point2[1] < 100) | (point1[0] < 100):
+            while (point2[1] < 846) | (point1[0] < 1127):
                 #update searching points
-                if point1[0] == 100:
+                if point1[0] == 1127:
                     pass
                 else:
                     point1[0] += 1
 
-                if point2[1] == 100:
+                if point2[1] == 846:
                     pass
                 else:
                     point2[1] += 1
@@ -172,10 +174,10 @@ class Soldier:
                             Soldier.output.write("Found enemy: " + s.name + "\n")
 
         elif self.orientation == 4:
-            while point1[1] <= 100:
+            while point1[1] <= 846:
                 #update searching points
                 point1[1] += 1
-                if point1[0] == 100:
+                if point1[0] == 1127:
                     pass
                 else :
                     point1[0] += 1
@@ -196,9 +198,9 @@ class Soldier:
                             Soldier.output.write("Found enemy: " + s.name + "\n")
 
         elif self.orientation == 5:
-            while (point2[0] > 0) | (point1[1] < 100):
+            while (point2[0] > 0) | (point1[1] < 846):
                 #update searching points
-                if point1[1] == 100:
+                if point1[1] == 846:
                     pass
                 else:
                     point1[1] += 1
@@ -235,7 +237,7 @@ class Soldier:
                     point2[1] -= 1
 
                 point1[0] -= 1
-                if point1[1] == 100:
+                if point1[1] == 846:
                     pass
                 else :
                     point1[1] += 1
@@ -388,7 +390,8 @@ class Soldier:
             self.coverQuality = 0
             coverRank = 99999
             bestCover = None
-            FIRETEAM_IDEAL_DISTANCE = 10
+            #approximately 5 yards
+            FIRETEAM_IDEAL_DISTANCE = 30
             friendScore = 0
             #will choose cover with lowest score
             for c in self.closestCover:
@@ -402,7 +405,7 @@ class Soldier:
                             friendScore += FIRETEAM_IDEAL_DISTANCE - dist
                 #get distance
                 score = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
-                score -= c.quality
+                score -= 3*c.quality
                 score += 10*c.current_occupancy
                 score += friendScore
                 if c.cover_available and score < coverRank:
@@ -471,7 +474,7 @@ class Soldier:
         for c in coverList:
             distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
             currentMax = max(minDistances)
-            if distance < currentMax :
+            if distance < currentMax and self.posx != c.center[0] and self.posy != c.center[1]:
                 index = minDistances.index(currentMax)
                 minDistances[index] = distance
                 closeCover[index] = c
