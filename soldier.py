@@ -56,7 +56,10 @@ class Soldier:
 
     def observe(self):
         #decrement suppression
-        self.suppression -= 5
+        if self.suppression <= 6:
+            self.suppression = 0
+        else:
+            self.suppression -= 5
 
         #reset enemy list
         self.enemyList = []
@@ -396,12 +399,12 @@ class Soldier:
             #will choose cover with lowest score
             for c in self.closestCover:
                 for s in Soldier.soldiers :
-                    if s.fireteam == self.fireteam and s.team = self.team :
+                    if s.fireteam == self.fireteam and s.team == self.team :
                         #find distance between fireteam member and cover
                         dist = math.hypot(c.center[0] - s.posx, c.center[1] - s.posy)
                         if dist >= FIRETEAM_IDEAL_DISTANCE :
                             friendScore += dist - FIRETEAM_IDEAL_DISTANCE
-                        else
+                        else :
                             friendScore += FIRETEAM_IDEAL_DISTANCE - dist
                 #get distance
                 score = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)

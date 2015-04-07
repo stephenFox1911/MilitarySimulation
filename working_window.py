@@ -8,11 +8,12 @@ from soldier import Soldier
 from usRifleman import USrifleman
 from talibanRifleman import TalibanRifleman
 from shotline import ShotLine
+from cover import Cover
 import csv
 
 #Global Window Parameters
-WIDTH = 800
-HEIGHT = 700
+WIDTH = 1128
+HEIGHT = 846
 TIME_BETWEEN_FRAMES = 100 #in milliseconds
 
 class SimArea(gtk.DrawingArea):
@@ -81,9 +82,13 @@ class SimArea(gtk.DrawingArea):
     def act(self):
         #TODO implement random combatant selection
         for red in self.red_combatants:
-            red.act()
+            isShot, target, shotSuccess = red.act()
+            if isShot:
+                self.shots.append(ShotLine(red.posx, red.posy, target.posx, target.posy, shotSuccess))
         for blue in self.blue_combatants:
-            blue.act()
+            isShot, target, shotSuccess = blue.act()
+            if isShot:
+                self.shots.append(ShotLine(blue.posx, blue.posy, target.posx, target.posy, shotSuccess))
         # for mortar in self.mortars:
         #     mortar.act() #TODO IS THIS IMPLEMENTED
 
@@ -96,13 +101,11 @@ class SimArea(gtk.DrawingArea):
 
         for i,line in enumerate(input_list):
             if line[0] == 'blue':
-                self.blue_combatants.append(USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4])))
+                self.blue_combatants.append(USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'red':
-                self.red_combatants.append(TalibanRifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4])))
-            elif line[0] == 'mortar':
-                pass #TODO IMPLEMENT
+                self.red_combatants.append(TalibanRifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'cover':
-                pass #TODO implement
+                self.cover_objects.append(Cover(int(line[1]), int(line[2]), int(line[3]), int(line[4])))
             else:
                 print "improper csv line: "
                 print line
@@ -115,7 +118,7 @@ class SimArea(gtk.DrawingArea):
 
         if self.inSim:
             #sets the background of the window to be the satellite image of the battlefield
-            pixbuf = gtk.gdk.pixbuf_new_from_file('GUI/temp.png')
+            pixbuf = gtk.gdk.pixbuf_new_from_file('GUI/bg.png')
             widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
 
             for red in self.red_combatants:
@@ -322,12 +325,18 @@ class Simulation(gtk.Window):
         #centers the window on the screen
         self.set_position(gtk.WIN_POS_CENTER)
 
+        #TODO comment
+        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+
         #create a SimArea object
         self.sim_area = SimArea(input_file)
         #create a key press event listener
         self.connect("key-press-event", self.on_key_down)#TODO TEMP?
         #create a key release event listener
         self.connect("key-release-event", self.on_key_up)#TODO TEMP?
+
+        self.connect("button-press-event", self.on_mouse)
+
         #adds the SimArea to the Simulation window
         self.add(self.sim_area)
 
@@ -338,12 +347,16 @@ class Simulation(gtk.Window):
 
     #####TEMP METHODS?######START
     def on_key_down(self, widget, event):
+        print "("+str(event.x)+","+str(event.y)+")"
         key = event.keyval
         self.sim_area.on_key_down(event)
 
     def on_key_up(self, widget, event):
         key = event.keyval
         self.sim_area.on_key_up(event)
+
+    def on_mouse(self, widget, event):
+        print "("+str(event.x)+","+str(event.y)+")"
     #####TEMP METHODS?######END
 
 class MortarShot:
