@@ -434,7 +434,7 @@ class Soldier:
             elif (bestCover.center[1] < self.posy + diffX) and (bestCover.center[0] < self.posx + diffY) and (bestCover.center[0] < self.posx) and (bestCover.center[1] < self.posy):
                 self.orientation = 7
             
-            distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
+            distance = math.hypot(bestCover.center[0] - self.posx, bestCover.center[1] - self.posy)
             #Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
             #Needs to be updated to stick the soldier behind cover
             if distance < self.moveSpeed:
@@ -475,9 +475,11 @@ class Soldier:
         closeCover = [None, None, None]
         
         for c in coverList:
-            distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
+            coverDistance = math.hypot(c.center[0] - self.objectiveX, c.center[1] - self.objectiveY)
+            selfDistance = math.hypot(self.posx - self.objectiveX, self.posy - self.objectiveY)
             currentMax = max(minDistances)
-            if distance < currentMax and self.posx != c.center[0] and self.posy != c.center[1]:
+
+            if distance < currentMax and self.posx != c.center[0] and self.posy != c.center[1] and coverDistance <= selfDistance:
                 index = minDistances.index(currentMax)
                 minDistances[index] = distance
                 closeCover[index] = c
