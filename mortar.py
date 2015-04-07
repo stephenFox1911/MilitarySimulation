@@ -1,5 +1,7 @@
 #!/usr/bin/python
 from soldier import Soldier
+import math
+import random
 
 class Mortar(object):
     
@@ -10,8 +12,8 @@ class Mortar(object):
     def attack(self, posx, posy):
 
         #Adding error to intial landing position, which is posx and posy
-        landingX = posx + randint(-10, 10)
-        landingY = posy + randint(-10, 10)
+        landingX = posx + random.gauss(0, 1)
+        landingY = posy + random.gauss(0, 1)
 
         #Actual radius of mortar damage; r1 = dead; r2 = heavy; r3 = light
         r1 = 5
@@ -23,14 +25,13 @@ class Mortar(object):
 
         #Looking for solider to hit
         for soldier in Soldier.soldiers:
-            if soldier.posx < landingX + r1 and soldier.posx > landingX - r1 and soldier.posy < landingY + r1 and soldier.posy > landingY - r1:
-                soldier.isDead = True
-            if soldier.posx < landingX + r2 and soldier.posx > landingX - r2 and soldier.posy < landingY + r2 and soldier.posy > landingY - r2:
-                soldier.suppression += 5/soldier.posx * heavySuppression
-            if soldier.posx < landingX + r3 and soldier.posx > landingX - r3 and soldier.posy < landingY + r3 and soldier.posy > landingY - r3:
-                soldier.suppression +=  5/soldier.posx * lightSuppression
-            else:
-                soldier.suppression = soldier.suppression
+            d = math.sqrt(math.pow((soldier.posx - landingX),2) - math.pow((soldier.posy - landingY),2))
+            if d <= 5:
+                soldier.isDead = True 
+            if d >5 and d <=15:
+                soldier.suppression += 5/d * heavySuppression
+            if d >15 and d <=50:
+                soldier.suppression += 5/d * lightSuppression
 
         #reduce ammo
         self.currentAmmo -= 1

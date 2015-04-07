@@ -56,7 +56,7 @@ class Soldier:
 
     def observe(self):
         #decrement suppression
-        if self.suppression <= 6:
+        if self.suppression <= 5:
             self.suppression = 0
         else:
             self.suppression -= 5
