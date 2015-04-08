@@ -1,6 +1,8 @@
 #!/usr/bin/python
-
 from soldier import Soldier
+from random import randint
+import random
+import math
 
 class TalibanRifleman(Soldier):
     'USrifleman with M16'
@@ -14,7 +16,47 @@ class TalibanRifleman(Soldier):
         return Soldier.observe(self)
 
     def decide(self):
-        return Soldier.decide(self)
+        # Higher numbers represent the "more aggressive" decision
+        decisionInt = randint(0,100) + self.aggression - self.suppression
+        
+        if self.state == "Neutral" :        
+            if decisionInt >= 50 and len(self.enemyList) > 0 :
+                self.state = "Engage"
+                #Logic for choosing different types of attacks goes here
+                self.currentAction = "SimpleAttack"                    
+            else :
+                self.state = "Cover"
+                self.currentAction = "Cover"
+        
+        elif self.state == "Cover" :
+            if decisionInt >= 50 and len(self.enemyList) > 0 :
+                self.state = "Engage"
+                #Logic for choosing different types of attacks goes here
+                self.currentAction = "SimpleAttack"
+            else :
+                self.state = "Cover"
+                self.currentAction = "Cover"
+        
+        elif self.state == "Engage" :
+            if decisionInt >= 50 and len(self.enemyList) > 0 :
+                self.state = "Engage"
+                #Logic for choosing different types of attacks goes here
+                self.currentAction = "SimpleAttack"
+
+            else :
+                self.state = "Cover"
+                self.currentAction = "Cover"
+        
+        elif self.state == "Move" :
+            if decisionInt >= 50 and len(self.enemyList) > 0 :
+                self.state = "Engage"
+                #Logic for choosing different types of attacks goes here
+                self.currentAction = "SimpleAttack"
+
+            else :
+                self.state = "Cover"
+                self.currentAction = "Cover"
+
     
     def act(self):
         return Soldier.act(self)
