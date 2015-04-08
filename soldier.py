@@ -44,14 +44,12 @@ class Soldier:
         hit = randint(0,100) + shotMod
         if hit > 100:
             print "successful hit"
-            Soldier.output.write("Successful Hit \n")
             enemy.isDead = True
             #remove this for production
             enemy.hits += 1
             return True
         else:
             print "shot misses"
-            Soldier.output.write("Shot Misses\n")
             #this needs to be mitigated by aggression somehow
             #also modified by quality of shot
             enemy.suppression += 5
@@ -158,10 +156,14 @@ class Soldier:
             
             #Attack enemy 3 times
             shotQuality = 50
-            Soldier.output.write(self.name + "- Simple Attack: TARGET: " + target.name + " \n")
-            for x in xrange(1,3):
+            Soldier.output.write(self.name + "- Simple Attack: TARGET: " + target.name)
+            for x in xrange(1,4):
                 if self.attack(target, shotQuality) :
                     shotSuccess = True
+            if shotSuccess :
+                Soldier.output.write(": Successful Hit\n")
+            else : 
+                Soldier.output.write(": Shot Missed\n")
 
         elif self.currentAction == "MachineGunAttack" :
             isShot = True
@@ -191,7 +193,6 @@ class Soldier:
             for c in self.closestCover:
                 if c is None :
                     continue
-                Soldier.output.write(self.name + "- Checking Cover: X: " + str(c.center[0]) + " Y: " + str(c.center[1]) + "\n")
                 for s in Soldier.soldiers :
                     if s.fireteam == self.fireteam and s.team == self.team :
                         #find distance between fireteam member and cover
@@ -244,6 +245,7 @@ class Soldier:
                     inCover = True
             #if there is no cover, the soldier goes prone
             if not inCover :
+                Soldier.output.write("Laying Down\n")
                 self.coverQuality = 20
             Soldier.output.write(self.name + "- Taking Cover, Quality = " + str(self.coverQuality) + "\n")
 
