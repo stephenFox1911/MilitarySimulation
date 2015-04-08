@@ -35,7 +35,7 @@ class Soldier:
         Soldier.soldierCount += 1
         Soldier.soldiers.append(self)
         self.moveSpeed = 30
-        self.targetDestination = None
+        self.targetCover = None
 
     def attack(self, enemy, quality):
         distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
@@ -231,7 +231,7 @@ class Soldier:
             elif (bestCover.center[1] < self.posy + diffX) and (bestCover.center[0] < self.posx + diffY) and (bestCover.center[0] < self.posx) and (bestCover.center[1] < self.posy):
                 self.orientation = 7
             
-            self.targetDestination = bestCover.center
+            self.targetCover = bestCover
 
         elif self.currentAction == "Cover" :
             print self.name + " Taking Cover"
@@ -253,17 +253,17 @@ class Soldier:
 
     def update(self):
         if self.state == "Move":
-            distance = math.hypot(self.targetDestination[0] - self.posx, self.targetDestination[1] - self.posy)
+            distance = math.hypot(self.targetCover.posx - self.posx, self.targetCover.posy - self.posy)
             #Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
             #Needs to be updated to stick the soldier behind cover
             if distance < self.moveSpeed/20: #TODO change from magic number
-                self.posx, self.posy = self.targetDestination
-                Soldier.output.write(self.name + "- I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
-                self.coverQuality = bestCover.quality
+                self.posx, self.posy = self.targetCover.center
+                Soldier.output.write(self.name + "- I WANT COVER: X: " + str(self.targetCover.center[0]) + " Y: " + str(self.targetCover.center[1]) + "\n")
+                self.coverQuality = self.targetCover.quality
                 self.state = "Cover"
             else :
-                dx = self.posx - self.targetDestination[0]
-                dy = self.posy - self.targetDestination[1]
+                dx = self.posx - self.targetCover[0]
+                dy = self.posy - self.targetCover[1]
                 theta = math.atan2(dy, dx)
                 self.posx -= math.cos(theta) * self.moveSpeed / 20 #TODO remove magic number
                 self.posy -= math.sin(theta) * self.moveSpeed / 20 #TODO remove magic number
