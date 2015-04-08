@@ -126,6 +126,7 @@ class SimArea(gtk.DrawingArea):
                 self.shots.append(ShotLine(blue.posx, blue.posy, target.posx, target.posy, shotSuccess))
                 if shotSuccess:
                     self.red_casualties.append(target)
+                    #TODO here, target is removed before this is executed. seems to be tied with multiple successful hits
                     self.red_combatants.remove(target)
         # for mortar in self.mortars:
         #     mortar.act() #TODO IS THIS IMPLEMENTED

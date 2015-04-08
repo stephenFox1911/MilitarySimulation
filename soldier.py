@@ -39,8 +39,8 @@ class Soldier:
 
     def attack(self, enemy, quality):
         distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
-        # if enemy is within 10 yards, ignore their cover
-        if distance < 60 :
+        # if enemy is within 30 yards, ignore their cover
+        if distance < 120 :
             shotMod = quality - self.suppression
         else: 
             #approximately 10% less likely to hit per 100 yards of distance
@@ -74,7 +74,7 @@ class Soldier:
         self.enemyList = []
 
         for s in Soldier.soldiers:
-            if s.team != self.team and s.isVisible and not s.isDead :
+            if s.team != self.team and not s.isDead :
                 self.enemyList.append(s)
 
     def decide(self):
@@ -150,47 +150,66 @@ class Soldier:
             print self.name + " Simple Attack"
 
             isShot = True
+            self.isVisible = True
             self.coverQuality -= 10
             #Finds target with least amount of cover and fires one shot
-            worstScore = 99999
+            worstScore = float("inf")
             
             for enemy in self.enemyList :
                 distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
-                if (enemy.coverQuality + distance) <= worstScore and not enemy.isDead:
-                    target = enemy
+                if distance < 120 :
+                    if (enemy.coverQuality + distance/60) <= worstScore and not enemy.isDead :
+                        target = enemy  
+                else :  
+                    if (enemy.coverQuality + distance/60) <= worstScore and not enemy.isDead and enemy.isVisible:
+                        target = enemy
             
-            #Attack enemy 3 times
-            shotQuality = 50
-            Soldier.output.write(self.name + "- Simple Attack: TARGET: " + target.name)
-            for x in xrange(1,4):
-                if self.attack(target, shotQuality) :
-                    shotSuccess = True
-            if shotSuccess :
-                Soldier.output.write(": Successful Hit\n")
-            else : 
-                Soldier.output.write(": Shot Missed\n")
+            if target is None :
+                isShot = False
+                self.currentAction = "Move"
+                self.state = "Move"
+                self.act()
+            else:
+                #Attack enemy 3 times
+                shotQuality = 50
+                Soldier.output.write(self.name + "- Simple Attack: TARGET: " + target.name)
+                for x in xrange(1,4):
+                    if self.attack(target, shotQuality) :
+                        shotSuccess = True
+                if shotSuccess :
+                    Soldier.output.write(": Successful Hit\n")
+                else : 
+                    Soldier.output.write(": Shot Missed\n")
 
         elif self.currentAction == "MachineGunAttack" :
             isShot = True
             self.coverQuality -= 10
-            lowSuppression = 1000
+            self.isVisible = True
+            lowSuppression = float("inf")
 
             for enemy in self.enemyList:
                 if not enemy.isDead and enemy.suppression <= lowSuppression :
                     target = enemy
                     lowSuppression = enemy.suppression
 
-            #Attack enemy multiple times
-            shotQuality = 25
-            Soldier.output.write(self.name + "- Machine Gun Attack: TARGET: " + target.name + " \n")
-            for x in xrange(1,10):
-                if self.attack(target, shotQuality) :
-                    shotSuccess = True
+            if target is None :
+                isShot = False
+                self.currentAction = "Move"
+                self.state = "Move"
+                self.act()
+            else: 
+                #Attack enemy multiple times
+                shotQuality = 25
+                Soldier.output.write(self.name + "- Machine Gun Attack: TARGET: " + target.name + " \n")
+                for x in xrange(1,10):
+                    if self.attack(target, shotQuality) :
+                        shotSuccess = True
 
         elif self.currentAction == "Move" :
             print self.name + " Move"
             self.coverQuality = 0
-            coverRank = 99999
+            self.isVisible = True
+            coverRank = float("inf")
             bestCover = None
             #approximately 5 yards
             FIRETEAM_IDEAL_DISTANCE = 30
@@ -249,6 +268,7 @@ class Soldier:
                 if c.in_cover(self.posx, self.posy) :
                     self.coverQuality = c.quality
                     inCover = True
+                    self.isVisible = False
             #if there is no cover, the soldier goes prone
             if not inCover :
                 Soldier.output.write("Laying Down\n")
