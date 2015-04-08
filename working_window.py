@@ -276,7 +276,8 @@ class SimArea(gtk.DrawingArea):
             cr.fill()
             cr.set_source_rgb(0, 0, 0)
             cr.move_to(blue.posx, blue.posy)
-            cr.line_to(blue.posx + (5*math.cos(blue.orientation*math.pi/4)), blue.posy + (5*math.sin(blue.orientation*math.pi/4)))
+            orientation = (blue.orientation + 2) % 7
+            cr.line_to(blue.posx + (5*math.cos(-orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
             cr.set_line_width(2)
             cr.stroke()
     def draw_red_soldiers(self, cr, red):
@@ -292,7 +293,8 @@ class SimArea(gtk.DrawingArea):
             cr.fill() #fill border
             cr.set_source_rgb(0, 0, 0) #set color to black
             cr.move_to(red.posx, red.posy) #move to center of circle
-            cr.line_to(red.posx + (5*math.cos(red.orientation*math.pi/4)), red.posy + (5*math.sin(red.orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
+            orientation = (red.orientation + 2) % 7
+            cr.line_to(red.posx + (5*math.cos(-orientation*math.pi/4)), red.posy + (5*math.sin(-orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
             cr.set_line_width(2)
             cr.stroke() #draw line indicating soldier orientation
     def draw_mortars(self, cr, mortar):
