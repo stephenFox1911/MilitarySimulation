@@ -167,9 +167,9 @@ class SimArea(gtk.DrawingArea):
                 self.draw_red_soldiers(cr, red)
             for blue in self.blue_combatants:
                 self.draw_blue_soldiers(cr, blue)
-            for red in self.draw_red_casualties:
+            for red in self.red_casualties:
                 self.draw_red_casualties(cr, red)
-            for blue in self.draw_blue_casualties:
+            for blue in self.blue_casualties:
                 self.draw_blue_casualties(cr, blue)
             for mortar in self.mortars: #TODO check implementation with Wayne
                 self.draw_mortars(cr, mortar)
