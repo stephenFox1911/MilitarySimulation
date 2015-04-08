@@ -19,17 +19,21 @@ def moveEast(soldier, distance):
 def main():
     output = open("output.txt", "a+")
 
-    cover1 = Cover(1, 1, 3, 3, 50, 3, "|")
-    cover2 = Cover(48, 48, 52, 52, 50, 3, "|")
-    cover3 = Cover(95, 95, 97, 97, 50, 3, "|")
+    #cover1 = Cover(1, 1, 50, 3,)
+    cover2 = Cover(48, 48, 50, 3)
+    cover3 = Cover(95, 95, 50, 3)
     
-    coverList = [cover1, cover2, cover3]
+    coverList = [cover2, cover3]
     
     # (self, name, team, posx, posy, orientation, aggression):
-    us1 = USmachineGunner("us1", "blue", "b1", 60, 60, 0, 50)
+    us1 = USrifleman("us1", "blue", "b1", 0, 0, 0, 0)
+    us1.objectiveX = 100
+    us1.objectiveY = 100
 
     # (self, name, team, posx, posy, orientation, aggression):
-    t1 = TalibanRifleman("t1", "red", "r1", 60, 40, 4, -50)
+    t1 = TalibanRifleman("t1", "red", "r1", 90, 90, 4, 0)
+    t1.objectiveX = 0
+    t1.objectiveY = 0
 
     for x in xrange(0,10):
         us1.findCover(coverList)

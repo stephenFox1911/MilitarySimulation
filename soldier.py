@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from random import randint
+import random
 import math
 
 class Soldier:
@@ -29,6 +30,8 @@ class Soldier:
         self.objectiveX = 0
         self.objectiveY = 0
         self.isDead = False
+        self.isVisible = True
+        self.fireteam = fireteam
         Soldier.soldierCount += 1
         Soldier.soldiers.append(self)
         self.moveSpeed = 30
@@ -42,7 +45,7 @@ class Soldier:
         if hit > 100:
             print "successful hit"
             Soldier.output.write("Successful Hit \n")
-            enemy.isDead = True
+            #enemy.isDead = True
             #remove this for production
             enemy.hits += 1
             return True
@@ -51,7 +54,7 @@ class Soldier:
             Soldier.output.write("Shot Misses\n")
             #this needs to be mitigated by aggression somehow
             #also modified by quality of shot
-            enemy.suppression += 10
+            enemy.suppression += 5
             return False
 
     def observe(self):
@@ -64,225 +67,10 @@ class Soldier:
         #reset enemy list
         self.enemyList = []
 
-        point1 = [self.posx, self.posy]
-        point2 = [self.posx, self.posy]
-
-        if self.orientation == 0:
-            while point1[1] >= 0:
-                #update searching points
-                point1[1] -= 1
-                if point1[0] == 0:
-                    pass
-                else :
-                    point1[0] -= 1
-
-                point2[1] -= 1
-                if point2[0] == 1127:
-                    pass
-                else :
-                    point2[0] += 1
-
-                #search inbetween these points for an enemy
-                for x in xrange(point1[0],point2[0]):
-                    y = point1[1]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-        elif self.orientation == 1:
-            while (point2[0] < 1127) | (point1[1] > 0):
-                #update searching points
-                if point1[1] == 0:
-                    pass
-                else:
-                    point1[1] -= 1
-
-                if point2[0] == 1127:
-                    pass
-                else:
-                    point2[0] += 1
-
-                #search inbetween the points for an enemy
-                for x in xrange(point1[0],point2[0]):
-                    y = point1[1]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-                for y in xrange(point1[1],point2[1]):
-                    x = point2[0]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-        elif self.orientation == 2:
-            while point1[0] <= 1127:
-                #update searching points
-                point1[0] += 1
-                if point1[1] == 0:
-                    pass
-                else :
-                    point1[1] -= 1
-
-                point2[0] += 1
-                if point2[1] == 846:
-                    pass
-                else :
-                    point2[1] += 1
-
-                #search inbetween these points for an enemy
-                for y in xrange(point1[1],point2[1]):
-                    x = point1[0]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-
-        elif self.orientation == 3:
-            while (point2[1] < 846) | (point1[0] < 1127):
-                #update searching points
-                if point1[0] == 1127:
-                    pass
-                else:
-                    point1[0] += 1
-
-                if point2[1] == 846:
-                    pass
-                else:
-                    point2[1] += 1
-
-                #search inbetween the points for an enemy
-                for x in xrange(point2[0],point1[0]):
-                    y = point2[1]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-                for y in xrange(point1[1],point2[1]):
-                    x = point1[0]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-        elif self.orientation == 4:
-            while point1[1] <= 846:
-                #update searching points
-                point1[1] += 1
-                if point1[0] == 1127:
-                    pass
-                else :
-                    point1[0] += 1
-
-                point2[1] += 1
-                if point2[0] == 0:
-                    pass
-                else :
-                    point2[0] -= 1
-
-                #search inbetween these points for an enemy
-                for x in xrange(point2[0],point1[0]):
-                    y = point1[1]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-        elif self.orientation == 5:
-            while (point2[0] > 0) | (point1[1] < 846):
-                #update searching points
-                if point1[1] == 846:
-                    pass
-                else:
-                    point1[1] += 1
-
-                if point2[0] == 0:
-                    pass
-                else:
-                    point2[0] -= 1
-
-                #search inbetween the points for an enemy
-                for x in xrange(point2[0],point1[0]):
-                    y = point2[1]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-                for y in xrange(point2[1],point1[1]):
-                    x = point1[0]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-        elif self.orientation == 6:
-            while point1[0] >= 0:
-                #update searching points
-                point2[0] -= 1
-                if point2[1] == 0:
-                    pass
-                else :
-                    point2[1] -= 1
-
-                point1[0] -= 1
-                if point1[1] == 846:
-                    pass
-                else :
-                    point1[1] += 1
-
-                #search inbetween these points for an enemy
-                for y in xrange(point2[1],point1[1]):
-                    x = point1[0]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-        elif self.orientation == 7:
-            while (point2[1] > 0) | (point1[0] > 0):
-                #update searching points
-                if point1[0] == 0:
-                    pass
-                else:
-                    point1[0] -= 1
-
-                if point2[1] == 0:
-                    pass
-                else:
-                    point2[1] -= 1
-
-                #search inbetween the points for an enemy
-                for x in xrange(point1[0],point2[0]):
-                    y = point2[1]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
-
-                for y in xrange(point2[1],point1[1]):
-                    x = point1[0]
-                    for s in Soldier.soldiers:
-                        if (s.posx == x) and (s.posy == y) and (s.team != self.team):
-                            self.enemyList.append(s)
-                            print("Found enemy: " + s.name)
-                            Soldier.output.write("Found enemy: " + s.name + "\n")
+        for s in Soldier.soldiers:
+            if s.team != self.team and s.isVisible :
+                self.enemyList.append(s)
+                Soldier.output.write("Found enemy: " + s.name + "\n")
 
     def decide(self):
         
@@ -382,7 +170,7 @@ class Soldier:
                     target = enemy
 
             #Attack enemy multiple times
-            shotQuality = 0
+            shotQuality = 25
             Soldier.output.write("Machine Gun Attack: TARGET: " + target.name + " \n")
             for x in xrange(1,10):
                 if self.attack(target, shotQuality) :
@@ -398,6 +186,9 @@ class Soldier:
             friendScore = 0
             #will choose cover with lowest score
             for c in self.closestCover:
+                if c is None :
+                    continue
+                Soldier.output.write("Checking Cover: X: " + str(c.center[0]) + " Y: " + str(c.center[1]) + "\n")
                 for s in Soldier.soldiers :
                     if s.fireteam == self.fireteam and s.team == self.team :
                         #find distance between fireteam member and cover
@@ -413,6 +204,8 @@ class Soldier:
                 score += friendScore
                 if c.cover_available and score < coverRank:
                     bestCover = c
+                    coverRank = score
+
             Soldier.output.write("Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
             #cover decision has been made, now orient and move towards it
             diffX = self.posx - bestCover.center[0]
@@ -444,16 +237,23 @@ class Soldier:
                 self.coverQuality = bestCover.quality
                 self.state = "Cover"
             else :
+                Soldier.output.write("MOVING TO COVER\n")
                 if bestCover.center[0] > self.posx + (self.moveSpeed/2) :
                     self.posx += self.moveSpeed/2
+                else :
+                    self.posx -= self.moveSpeed/2
                 if bestCover.center[1] > self.posy + (self.moveSpeed/2) :
                     self.posy += self.moveSpeed/2
+                else :
+                    self.posy -= self.moveSpeed/2
             
         elif self.currentAction == "Cover" :
             print self.name + " Taking Cover"
             #get value of cover if in use
             inCover = False
             for c in self.closestCover :
+                if c is None :
+                    continue
                 if c.in_cover(self.posx, self.posy) :
                     self.coverQuality = c.quality
                     inCover = True
@@ -461,6 +261,8 @@ class Soldier:
             if not inCover :
                 self.coverQuality = 20
             Soldier.output.write("Taking Cover, Quality = " + str(self.coverQuality) + "\n")
+
+        random.shuffle(Soldier.soldiers)
         return (isShot, target, shotSuccess)
 
             
@@ -477,9 +279,10 @@ class Soldier:
         for c in coverList:
             coverDistance = math.hypot(c.center[0] - self.objectiveX, c.center[1] - self.objectiveY)
             selfDistance = math.hypot(self.posx - self.objectiveX, self.posy - self.objectiveY)
+            distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
             currentMax = max(minDistances)
 
-            if distance < currentMax and self.posx != c.center[0] and self.posy != c.center[1] and coverDistance <= selfDistance:
+            if distance < currentMax and coverDistance < selfDistance:
                 index = minDistances.index(currentMax)
                 minDistances[index] = distance
                 closeCover[index] = c
