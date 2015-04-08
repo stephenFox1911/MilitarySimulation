@@ -262,8 +262,8 @@ class Soldier:
                 self.coverQuality = self.targetCover.quality
                 self.state = "Cover"
             else :
-                dx = self.posx - self.targetCover[0]
-                dy = self.posy - self.targetCover[1]
+                dx = self.posx - self.targetCover.posx
+                dy = self.posy - self.targetCover.posy
                 theta = math.atan2(dy, dx)
                 self.posx -= math.cos(theta) * self.moveSpeed / 20 #TODO remove magic number
                 self.posy -= math.sin(theta) * self.moveSpeed / 20 #TODO remove magic number
