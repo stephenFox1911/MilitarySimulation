@@ -34,7 +34,8 @@ class SimArea(gtk.DrawingArea):
         self.mortar_shots = []
         self.cover_objects = []
         self.count = 0
-        self.objectives = [(741,670), (799,153)]
+        #self.objectives = [(741,670), (799,153)]
+        self.objectives = [(750,350), (0,0)]
         self.reached_turn = False
         self.danger_close = False
         ######TEMP VARIABLES#####START
@@ -141,11 +142,11 @@ class SimArea(gtk.DrawingArea):
 
         for i,line in enumerate(input_list):
             if line[0] == 'blue':
-                blue = USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue = USrifleman("BlueSoldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
                 blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
                 self.blue_combatants.append(blue)
             elif line[0] == 'red':
-                self.red_combatants.append(TalibanRifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
+                self.red_combatants.append(TalibanRifleman("RedSoldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'cover':
                 self.cover_objects.append(Cover(int(line[1]), int(line[2]), int(line[3]), int(line[4])))
             else:

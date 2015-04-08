@@ -72,9 +72,8 @@ class Soldier:
         self.enemyList = []
 
         for s in Soldier.soldiers:
-            if s.team != self.team and s.isVisible :
+            if s.team != self.team and s.isVisible and not s.isDead :
                 self.enemyList.append(s)
-                Soldier.output.write(self.name + "- Found enemy: " + s.name + "\n")
 
     def decide(self):
         
@@ -154,7 +153,7 @@ class Soldier:
             worstCover = 1000
             
             for enemy in self.enemyList :
-                if enemy.coverQuality <= worstCover :
+                if enemy.coverQuality <= worstCover and not enemy.isDead:
                     target = enemy
             
             #Attack enemy 3 times
@@ -169,7 +168,7 @@ class Soldier:
             self.coverQuality -= 10
             lowSuppression = 1000
 
-            for enemy in self.enemyList :
+            for enemy in self.enemyList and not enemy.isDead:
                 if enemy.suppression <= lowSuppression :
                     target = enemy
 
@@ -206,7 +205,7 @@ class Soldier:
                 score -= 3*c.quality
                 score += 10*c.current_occupancy
                 score += friendScore
-                if c.cover_available and score < coverRank:
+                if c.cover_available and score < coverRank and not c.in_cover(self.posx, self.posy):
                     bestCover = c
                     coverRank = score
 
@@ -275,8 +274,8 @@ class Soldier:
     
     def findCover(self, coverList):
         #returns the three closest pieces of cover
-        minDistances = [99999, 99998, 99997]
-        closeCover = [None, None, None]
+        minDistances = [99999, 99998, 99997, 99996]
+        closeCover = [None, None, None, None]
         
         for c in coverList:
             coverDistance = math.hypot(c.center[0] - self.objectiveX, c.center[1] - self.objectiveY)
@@ -284,7 +283,7 @@ class Soldier:
             distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
             currentMax = max(minDistances)
 
-            if distance < currentMax and coverDistance < selfDistance:
+            if distance < currentMax and coverDistance <= selfDistance:
                 index = minDistances.index(currentMax)
                 minDistances[index] = distance
                 closeCover[index] = c
