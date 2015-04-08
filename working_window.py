@@ -13,6 +13,7 @@ from talibanMachineGunner import TalibanMachineGunner
 from usFireteamLeader import USfireteamLeader
 from shotline import ShotLine
 from cover import Cover
+from mortar import Mortar
 import csv
 
 #Global Window Parameters
