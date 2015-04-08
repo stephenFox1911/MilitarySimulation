@@ -57,7 +57,7 @@ class Soldier:
             enemy.suppression += 5
             return False
 
-    def updateObjective(self, x,y)
+    def updateObjective(self, x, y):
         self.objectiveX = x
         self.objectiveY = y
 

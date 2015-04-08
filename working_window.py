@@ -31,6 +31,9 @@ class SimArea(gtk.DrawingArea):
         self.mortar_shots = []
         self.cover_objects = []
         self.count = 0
+        self.objectives = [(741,670), (799,153)]
+        self.reached_turn = False
+        self.danger_close = False
         ######TEMP VARIABLES#####START
         self.left = False
         self.right = False
@@ -59,6 +62,7 @@ class SimArea(gtk.DrawingArea):
                 self.decide()
                 self.act()
             self.updateSoldiers()
+            self.checkObjectives()
 
             self.move()#TODO TEMP?
             self.queue_draw() #gtk function to draw all queued changes
@@ -67,6 +71,23 @@ class SimArea(gtk.DrawingArea):
         else:
             self.count += 1
             return False
+
+    def checkObjectives(self):
+        for blue in self.blue_combatants:
+            count = 0
+            if not self.reached_turn:
+                d = math.hypot(blue.posx - blue.objectiveX, blue.posy - blue.objectiveY)
+                if d < 40:
+                    count += 1
+            if count >= 7:
+                self.reached_turn = True
+        if self.reached_turn and not self.danger_close:
+            for blue in self.blue_combatants:
+                blue.updateObjective(self.objectives[1][0], self.objectives[1][1])
+        if self.danger_close:
+            pass
+            #TODO add mortar stuff
+
 
     def observe(self):
         #TODO implement random combatant selection
@@ -114,7 +135,9 @@ class SimArea(gtk.DrawingArea):
 
         for i,line in enumerate(input_list):
             if line[0] == 'blue':
-                self.blue_combatants.append(USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
+                blue = USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
+                self.blue_combatants.append(blue)
             elif line[0] == 'red':
                 self.red_combatants.append(TalibanRifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'cover':
@@ -369,6 +392,9 @@ class Simulation(gtk.Window):
     def on_key_up(self, widget, event):
         key = event.keyval
         self.sim_area.on_key_up(event)
+
+    def on_mouse(self, widget, event):
+        print "("+str(event.x)+","+str(event.y)+")"
     #####TEMP METHODS?######END
 
 class MortarShot:
