@@ -434,21 +434,8 @@ class Soldier:
             elif (bestCover.center[1] < self.posy + diffX) and (bestCover.center[0] < self.posx + diffY) and (bestCover.center[0] < self.posx) and (bestCover.center[1] < self.posy):
                 self.orientation = 7
             
-            distance = math.hypot(bestCover.center[0] - self.posx, bestCover.center[1] - self.posy)
-            #Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
-            #Needs to be updated to stick the soldier behind cover
-            if distance < self.moveSpeed:
-                self.posx = bestCover.center[0]
-                self.posy = bestCover.center[1]
-                Soldier.output.write("I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
-                self.coverQuality = bestCover.quality
-                self.state = "Cover"
-            else :
-                if bestCover.center[0] > self.posx + (self.moveSpeed/2) :
-                    self.posx += self.moveSpeed/2
-                if bestCover.center[1] > self.posy + (self.moveSpeed/2) :
-                    self.posy += self.moveSpeed/2
-            
+            self.targetDestination = bestCover.center
+
         elif self.currentAction == "Cover" :
             print self.name + " Taking Cover"
             #get value of cover if in use
@@ -463,7 +450,23 @@ class Soldier:
             Soldier.output.write("Taking Cover, Quality = " + str(self.coverQuality) + "\n")
         return (isShot, target, shotSuccess)
 
-            
+    def update(self):
+        if self.state == "Move":
+            distance = math.hypot(self.targetDestination[0] - self.posx, self.targetDestination[1] - self.posy)
+            #Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
+            #Needs to be updated to stick the soldier behind cover
+            if distance < self.moveSpeed/20: #TODO change from magic number
+                self.posx, self.posy = self.targetDestination
+                Soldier.output.write("I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
+                self.coverQuality = bestCover.quality
+                self.state = "Cover"
+            else :
+                dx = self.posx - self.targetDestination[0]
+                dy = self.posy - self.targetDestination[1]
+                theta = math.atan2(dy, dx)
+                self.posx -= math.cos(theta) * self.moveSpeed / 20 #TODO remove magic number
+                self.posy -= math.sin(theta) * self.moveSpeed / 20 #TODO remove magic number
+
     def displaySoldier(self):
         out = "Name: " + self.name +  ", Position:(" + str(self.posx) + "," + str(self.posy) + "), orientation:" + str(self.orientation) + "\n"
         print out
