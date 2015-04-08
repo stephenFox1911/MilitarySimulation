@@ -23,8 +23,6 @@ class Soldier:
         self.state = "Neutral"
         self.coverQuality = 0
         self.currentAction = "None"
-        #remove this for production
-        self.hits = 0
         self.enemyList = []
         self.closestCover = []
         self.objectiveX = 0
@@ -49,8 +47,6 @@ class Soldier:
         if hit > 100:
             print "successful hit"
             enemy.isDead = True
-            #remove this for production
-            enemy.hits += 1
             return True
         else:
             print "shot misses"
