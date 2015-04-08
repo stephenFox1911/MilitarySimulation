@@ -39,8 +39,12 @@ class Soldier:
 
     def attack(self, enemy, quality):
         distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
-        #approximately 10% less likely to hit per 100 yards of distance
-        shotMod = quality - self.suppression - enemy.coverQuality - (distance/60)
+        # if enemy is within 10 yards, ignore their cover
+        if distance < 60 :
+            shotMod = quality - self.suppression
+        else: 
+            #approximately 10% less likely to hit per 100 yards of distance
+            shotMod = quality - self.suppression - enemy.coverQuality - (distance/60)
         hit = randint(0,100) + shotMod
         if hit > 100:
             print "successful hit"
@@ -148,10 +152,11 @@ class Soldier:
             isShot = True
             self.coverQuality -= 10
             #Finds target with least amount of cover and fires one shot
-            worstCover = 1000
+            worstScore = 99999
             
             for enemy in self.enemyList :
-                if enemy.coverQuality <= worstCover and not enemy.isDead:
+                distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
+                if (enemy.coverQuality + distance) <= worstScore and not enemy.isDead:
                     target = enemy
             
             #Attack enemy 3 times
@@ -211,7 +216,7 @@ class Soldier:
                     bestCover = c
                     coverRank = score
 
-            Soldier.output.write(self.name + "- Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
+            Soldier.output.write(self.name + "- Moving to Cover \n")
             #cover decision has been made, now orient and move towards it
             diffX = self.posx - bestCover.center[0]
             diffY = self.posy - bestCover.center[1]
@@ -256,13 +261,11 @@ class Soldier:
     def update(self):
         if self.state == "Move":
             distance = math.hypot(self.targetCover.posx - self.posx, self.targetCover.posy - self.posy)
-            #Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
-            #Needs to be updated to stick the soldier behind cover
             if distance < self.moveSpeed/20: #TODO change from magic number
                 self.posx, self.posy = self.targetCover.center
-                Soldier.output.write(self.name + "- I WANT COVER: X: " + str(self.targetCover.center[0]) + " Y: " + str(self.targetCover.center[1]) + "\n")
                 self.coverQuality = self.targetCover.quality
                 self.state = "Cover"
+                self.targetCover = None
             else :
                 dx = self.posx - self.targetCover.posx
                 dy = self.posy - self.targetCover.posy
