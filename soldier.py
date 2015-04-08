@@ -45,7 +45,7 @@ class Soldier:
         if hit > 100:
             print "successful hit"
             Soldier.output.write("Successful Hit \n")
-            #enemy.isDead = True
+            enemy.isDead = True
             #remove this for production
             enemy.hits += 1
             return True

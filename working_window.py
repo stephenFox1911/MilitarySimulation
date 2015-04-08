@@ -94,6 +94,7 @@ class SimArea(gtk.DrawingArea):
             red.observe()
         for blue in self.blue_combatants:
             blue.observe()
+            blue.findCover(self.cover_objects)
         # for mortar in self.mortars:
         #     mortar.observe() #TODO IS THIS IMPLEMENTED
 
