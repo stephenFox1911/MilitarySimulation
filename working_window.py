@@ -145,19 +145,19 @@ class SimArea(gtk.DrawingArea):
 
         for i,line in enumerate(input_list):
             if line[0] == 'bluer':
-                blue = USrifleman("soldier"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue = USrifleman("Blue Rifleman"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
                 blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
                 self.blue_combatants.append(blue)
             elif line[0] == 'bluem':
-                blue = USmachineGunner("soldier"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue = USmachineGunner("Blue MachineGunner"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
                 blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
                 self.blue_combatants.append(blue)
             elif line[0] == 'bluef':
-                blue = USfireteamLeader("soldier"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue = USfireteamLeader("Blue Fireteam Leader"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
                 blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
                 self.blue_combatants.append(blue)
             elif line[0] == 'red':
-                self.red_combatants.append(TalibanRifleman("RedSoldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
+                self.red_combatants.append(TalibanRifleman("Red Rifleman"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'cover':
                 self.cover_objects.append(Cover(int(line[1]), int(line[2]), int(line[3]), int(line[4])))
             else:
