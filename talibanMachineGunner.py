@@ -4,8 +4,8 @@ from random import randint
 import random
 import math
 
-class TalibanRifleman(Soldier):
-    'USrifleman with M16'
+class TalibanMachineGunner(Soldier):
+    'Taliban soldier with machine gun'
 
     def __init__(self, name, team, fireteam, posx, posy, orientation, aggression):
         # subclass specific arguments go here

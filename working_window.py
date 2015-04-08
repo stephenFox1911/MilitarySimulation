@@ -9,6 +9,7 @@ from soldier import Soldier
 from usRifleman import USrifleman
 from usMachineGunner import USmachineGunner
 from talibanRifleman import TalibanRifleman
+from talibanMachineGunner import TalibanMachineGunner
 from usFireteamLeader import USfireteamLeader
 from shotline import ShotLine
 from cover import Cover
@@ -101,8 +102,6 @@ class SimArea(gtk.DrawingArea):
         for blue in self.blue_combatants:
             blue.observe()
             blue.findCover(self.cover_objects)
-        # for mortar in self.mortars:
-        #     mortar.observe() #TODO IS THIS IMPLEMENTED
 
     def decide(self):
         for red in self.red_combatants:
@@ -156,8 +155,10 @@ class SimArea(gtk.DrawingArea):
                 blue = USfireteamLeader("Blue Fireteam Leader"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
                 blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
                 self.blue_combatants.append(blue)
-            elif line[0] == 'red':
+            elif line[0] == 'redr':
                 self.red_combatants.append(TalibanRifleman("Red Rifleman"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
+            elif line[0] == 'redm':
+                self.red_combatants.append(TalibanMachineGunner("Red MachineGunner"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'cover':
                 self.cover_objects.append(Cover(int(line[1]), int(line[2]), int(line[3]), int(line[4])))
             else:
