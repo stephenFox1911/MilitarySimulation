@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import gtk
 import cairo
@@ -44,7 +45,7 @@ class SimArea(gtk.DrawingArea):
         ######TEMP VARIABLES#####END
 
         #sets the size of the drawing area
-        self.set_size_request(WIDTH, HEIGHT)#TODO change according to new picture
+        self.set_size_request(WIDTH, HEIGHT)
         #event listener that determines how SimArea displays itself
         self.connect("expose-event", self.expose)
         self.init_sim()
@@ -64,7 +65,6 @@ class SimArea(gtk.DrawingArea):
             self.updateSoldiers()
             self.checkObjectives()
 
-            self.move()#TODO TEMP?
             self.queue_draw() #gtk function to draw all queued changes
             self.count += 1
             return True
@@ -90,7 +90,6 @@ class SimArea(gtk.DrawingArea):
 
 
     def observe(self):
-        #TODO implement random combatant selection
         for red in self.red_combatants:
             red.observe()
         for blue in self.blue_combatants:
@@ -99,7 +98,6 @@ class SimArea(gtk.DrawingArea):
         #     mortar.observe() #TODO IS THIS IMPLEMENTED
 
     def decide(self):
-        #TODO implement random combatant selection
         for red in self.red_combatants:
             red.decide()
         for blue in self.blue_combatants:
@@ -108,7 +106,6 @@ class SimArea(gtk.DrawingArea):
         #     mortar.decide() #TODO IS THIS IMPLEMENTED
 
     def act(self):
-        #TODO implement random combatant selection
         for red in self.red_combatants:
             isShot, target, shotSuccess = red.act()
             if isShot:
@@ -161,7 +158,7 @@ class SimArea(gtk.DrawingArea):
                 self.draw_red_soldiers(cr, red)
             for blue in self.blue_combatants:
                 self.draw_blue_soldiers(cr, blue)
-            for mortar in self.mortars: #TODO cheack implementation with Wayne
+            for mortar in self.mortars: #TODO check implementation with Wayne
                 self.draw_mortars(cr, mortar)
             for shot in self.shots:
                 cr.set_line_width(2)
@@ -211,43 +208,6 @@ class SimArea(gtk.DrawingArea):
         cr.move_to(w - width/2, h)
         cr.show_text("Simulation Over")
         self.inSim = False
-
-    def move(self): #TODO TEMP: implements temporary keyboard movement
-        if self.left:
-            for red in self.red_combatants:
-                red.posx -= 1
-            for blue in self.blue_combatants:
-                blue.posx -= 1
-
-        if self.right: 
-            for red in self.red_combatants:
-                red.posx += 1
-            for blue in self.blue_combatants:
-                blue.posx += 1
-
-        if self.up:
-            for red in self.red_combatants:
-                red.posy -= 1
-            for blue in self.blue_combatants:
-                blue.posy -= 1
-
-        if self.down:
-            for red in self.red_combatants:
-                red.posy += 1
-            for blue in self.blue_combatants:
-                blue.posy += 1
-
-        if self.rRight:
-            for red in self.red_combatants:
-                red.orientation -= 0.1
-            for blue in self.blue_combatants:
-                blue.orientation += 0.1
-
-        if self.rLeft:
-            for red in self.red_combatants:
-                red.orientation += 0.1
-            for blue in self.blue_combatants:
-                blue.orientation -= 0.1
 
     #####TEMP METHODS?######START
     def on_key_down(self, event):
@@ -307,25 +267,33 @@ class SimArea(gtk.DrawingArea):
         cr.set_source_rgb(0, 0, 0)
         cr.arc(blue.posx, blue.posy, 5, 0, 2*math.pi)
         cr.stroke_preserve()
-        cr.set_source_rgb(0, 0, 1)
-        cr.fill()
-        cr.set_source_rgb(0, 0, 0)
-        cr.move_to(blue.posx, blue.posy)
-        cr.line_to(blue.posx + (5*math.cos(blue.orientation*math.pi/4)), blue.posy + (5*math.sin(blue.orientation*math.pi/4)))
-        cr.set_line_width(2)
-        cr.stroke()
+        if blue.isDead:
+            cr.set_source_rgb(0,0,0.5)
+            cr.fill()
+        else:
+            cr.set_source_rgb(0, 0, 1)
+            cr.fill()
+            cr.set_source_rgb(0, 0, 0)
+            cr.move_to(blue.posx, blue.posy)
+            cr.line_to(blue.posx + (5*math.cos(blue.orientation*math.pi/4)), blue.posy + (5*math.sin(blue.orientation*math.pi/4)))
+            cr.set_line_width(2)
+            cr.stroke()
     def draw_red_soldiers(self, cr, red):
         cr.set_line_width(1) #border width
         cr.set_source_rgb(0, 0, 0) #border color black
         cr.arc(red.posx, red.posy, 5, 0, 2*math.pi) #border shape and position (circle)
         cr.stroke_preserve() #draw border
-        cr.set_source_rgb(1, 0, 0) #set color to red
-        cr.fill() #fill border
-        cr.set_source_rgb(0, 0, 0) #set color to black
-        cr.move_to(red.posx, red.posy) #move to center of circle
-        cr.line_to(red.posx + (5*math.cos(red.orientation*math.pi/4)), red.posy + (5*math.sin(red.orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
-        cr.set_line_width(2)
-        cr.stroke() #draw line indicating soldier orientation
+        if red.isDead:
+            cr.set_source_rgb(.5, 0, 0)
+            cr.fill()
+        else:
+            cr.set_source_rgb(1, 0, 0) #set color to red
+            cr.fill() #fill border
+            cr.set_source_rgb(0, 0, 0) #set color to black
+            cr.move_to(red.posx, red.posy) #move to center of circle
+            cr.line_to(red.posx + (5*math.cos(red.orientation*math.pi/4)), red.posy + (5*math.sin(red.orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
+            cr.set_line_width(2)
+            cr.stroke() #draw line indicating soldier orientation
     def draw_mortars(self, cr, mortar):
         cr.set_line_width(1)
         cr.set_source_rgb(0, 0, 0)
@@ -368,8 +336,6 @@ class Simulation(gtk.Window):
         self.sim_area = SimArea(input_file)
         #create a key press event listener
         self.connect("key-press-event", self.on_key_down)#TODO TEMP?
-        #create a key release event listener
-        self.connect("key-release-event", self.on_key_up)#TODO TEMP?
 
         self.connect("button-press-event", self.on_mouse)
 
@@ -388,10 +354,6 @@ class Simulation(gtk.Window):
         else:
             key = event.keyval
             self.sim_area.on_key_down(event)
-
-    def on_key_up(self, widget, event):
-        key = event.keyval
-        self.sim_area.on_key_up(event)
 
     def on_mouse(self, widget, event):
         print "("+str(event.x)+","+str(event.y)+")"

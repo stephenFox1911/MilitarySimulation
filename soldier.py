@@ -74,7 +74,7 @@ class Soldier:
         for s in Soldier.soldiers:
             if s.team != self.team and s.isVisible :
                 self.enemyList.append(s)
-                Soldier.output.write("Found enemy: " + s.name + "\n")
+                Soldier.output.write(self.name + "- Found enemy: " + s.name + "\n")
 
     def decide(self):
         
@@ -159,7 +159,7 @@ class Soldier:
             
             #Attack enemy 3 times
             shotQuality = 50
-            Soldier.output.write("Simple Attack: TARGET: " + target.name + " \n")
+            Soldier.output.write(self.name + "- Simple Attack: TARGET: " + target.name + " \n")
             for x in xrange(1,3):
                 if self.attack(target, shotQuality) :
                     shotSuccess = True
@@ -175,7 +175,7 @@ class Soldier:
 
             #Attack enemy multiple times
             shotQuality = 25
-            Soldier.output.write("Machine Gun Attack: TARGET: " + target.name + " \n")
+            Soldier.output.write(self.name + "- Machine Gun Attack: TARGET: " + target.name + " \n")
             for x in xrange(1,10):
                 if self.attack(target, shotQuality) :
                     shotSuccess = True
@@ -192,7 +192,7 @@ class Soldier:
             for c in self.closestCover:
                 if c is None :
                     continue
-                Soldier.output.write("Checking Cover: X: " + str(c.center[0]) + " Y: " + str(c.center[1]) + "\n")
+                Soldier.output.write(self.name + "- Checking Cover: X: " + str(c.center[0]) + " Y: " + str(c.center[1]) + "\n")
                 for s in Soldier.soldiers :
                     if s.fireteam == self.fireteam and s.team == self.team :
                         #find distance between fireteam member and cover
@@ -210,7 +210,7 @@ class Soldier:
                     bestCover = c
                     coverRank = score
 
-            Soldier.output.write("Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
+            Soldier.output.write(self.name + "- Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
             #cover decision has been made, now orient and move towards it
             diffX = self.posx - bestCover.center[0]
             diffY = self.posy - bestCover.center[1]
@@ -246,7 +246,7 @@ class Soldier:
             #if there is no cover, the soldier goes prone
             if not inCover :
                 self.coverQuality = 20
-            Soldier.output.write("Taking Cover, Quality = " + str(self.coverQuality) + "\n")
+            Soldier.output.write(self.name + "- Taking Cover, Quality = " + str(self.coverQuality) + "\n")
 
         random.shuffle(Soldier.soldiers)
         return (isShot, target, shotSuccess)
@@ -258,7 +258,7 @@ class Soldier:
             #Needs to be updated to stick the soldier behind cover
             if distance < self.moveSpeed/20: #TODO change from magic number
                 self.posx, self.posy = self.targetDestination
-                Soldier.output.write("I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
+                Soldier.output.write(self.name + "- I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
                 self.coverQuality = bestCover.quality
                 self.state = "Cover"
             else :

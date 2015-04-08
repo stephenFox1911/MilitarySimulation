@@ -12,7 +12,7 @@ class Mortar(object):
     def attack(self, posx, posy):
 
         #Adding error to intial landing position, which is posx and posy
-        landingX = posx + random.gauss(0, 1)
+        landingX = posx + random.gauss(0, 1)#-change to more accurate range of values
         landingY = posy + random.gauss(0, 1)
 
         #Actual radius of mortar damage; r1 = dead; r2 = heavy; r3 = light
