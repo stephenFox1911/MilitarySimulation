@@ -275,6 +275,7 @@ class Soldier:
         Soldier.output.write(out)
     
     def findCover(self, coverList):
+        Soldier.output.write(self.name + " Looking for Cover\n")
         #returns the three closest pieces of cover
         minDistances = [99999, 99998, 99997, 99996]
         closeCover = [None, None, None, None]

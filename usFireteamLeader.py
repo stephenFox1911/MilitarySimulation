@@ -75,20 +75,7 @@ class USfireteamLeader(Soldier):
             elif (bestCover.center[1] < self.posy + diffX) and (bestCover.center[0] < self.posx + diffY) and (bestCover.center[0] < self.posx) and (bestCover.center[1] < self.posy):
                 self.orientation = 7
             
-            distance = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
-            #Currently the soldier moves to the middle of the cover mostly because I'm feeling lazy
-            #Needs to be updated to stick the soldier behind cover
-            if distance < self.moveSpeed:
-                self.posx = bestCover.center[0]
-                self.posy = bestCover.center[1]
-                Soldier.output.write("I WANT COVER: X: " + str(bestCover.center[0]) + " Y: " + str(bestCover.center[1]) + "\n")
-                self.coverQuality = bestCover.quality
-                self.state = "Cover"
-            else :
-                if bestCover.center[0] > self.posx + (self.moveSpeed/2) :
-                    self.posx += self.moveSpeed/2
-                if bestCover.center[1] > self.posy + (self.moveSpeed/2) :
-                    self.posy += self.moveSpeed/2
+            self.targetCover = bestCover
             
         elif self.currentAction == "Cover" :
             print self.name + " Taking Cover"
