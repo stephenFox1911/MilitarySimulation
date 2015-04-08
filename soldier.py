@@ -173,6 +173,7 @@ class Soldier:
             for enemy in self.enemyList:
                 if not enemy.isDead and enemy.suppression <= lowSuppression :
                     target = enemy
+                    lowSuppression = enemy.suppression
 
             #Attack enemy multiple times
             shotQuality = 25
