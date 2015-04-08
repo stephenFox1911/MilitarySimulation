@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from soldier import Soldier
+import math
 
 class USrifleman(Soldier):
     'USrifleman with M16'

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from soldier import Soldier
+import math
 
 class USfireteamLeader(Soldier):
     'Fireteam Leader with M16'
@@ -51,7 +52,6 @@ class USfireteamLeader(Soldier):
                 score = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
                 score -= 3*c.quality
                 score += 10*c.current_occupancy
-                score += friendScore
                 if c.cover_available and score < coverRank:
                     bestCover = c
             Soldier.output.write("Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
