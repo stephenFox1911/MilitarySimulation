@@ -32,7 +32,7 @@ class Soldier:
         Soldier.soldierCount += 1
         Soldier.soldiers.append(self)
         self.moveSpeed = 30
-        
+        self.targetDestination = None
 
     def attack(self, enemy, quality):
         distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
