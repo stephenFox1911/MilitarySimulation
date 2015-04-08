@@ -13,7 +13,7 @@ class USmachineGunner(Soldier):
         self.moveSpeed = 20
 
     def observe(self):
-        Soldier.observe(self)
+        return Soldier.observe(self)
 
     def decide(self):
         
@@ -79,11 +79,11 @@ class USmachineGunner(Soldier):
                 self.state = "Move"
                 self.currentAction = "Move"
 
-    
+
     def act(self):
-        Soldier.act(self)
+        return Soldier.act(self)
 
     def displaySoldier(self):
-        Soldier.displaySoldier(self)
+        return Soldier.displaySoldier(self)
 
 

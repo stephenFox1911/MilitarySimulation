@@ -48,17 +48,24 @@ class SimArea(gtk.DrawingArea):
 
     def on_timer(self):
         #called for each tick of the simulation
-        self.count += 1
+        #print self.count
         if self.inSim:
             #check simulation processes
-            # if self.count%10 == 0:
-            #     self.observe()
-            #     self.decide()
-            #     self.act()
+            if self.count%20 == 0:
+                #randomly shuffle combatants for decision making process
+                random.shuffle(self.red_combatants)
+                random.shuffle(self.blue_combatants)
+                self.observe()
+                self.decide()
+                self.act()
+            self.updateSoldiers()
+
             self.move()#TODO TEMP?
-            self.queue_draw() #gtk function to draw all queued actions
+            self.queue_draw() #gtk function to draw all queued changes
+            self.count += 1
             return True
         else:
+            self.count += 1
             return False
 
     def observe(self):
@@ -91,6 +98,12 @@ class SimArea(gtk.DrawingArea):
                 self.shots.append(ShotLine(blue.posx, blue.posy, target.posx, target.posy, shotSuccess))
         # for mortar in self.mortars:
         #     mortar.act() #TODO IS THIS IMPLEMENTED
+
+    def updateSoldiers(self):
+        for red in self.red_combatants:
+            red.update()
+        for blue in self.blue_combatants:
+            blue.update()
 
     def init_sim(self):
         #initializes the simulation by reading all data from a csv
@@ -347,16 +360,15 @@ class Simulation(gtk.Window):
 
     #####TEMP METHODS?######START
     def on_key_down(self, widget, event):
-        print "("+str(event.x)+","+str(event.y)+")"
-        key = event.keyval
-        self.sim_area.on_key_down(event)
+        if event.type == gtk.gdk.BUTTON_PRESS:
+            print "("+str(event.x)+","+str(event.y)+")"
+        else:
+            key = event.keyval
+            self.sim_area.on_key_down(event)
 
     def on_key_up(self, widget, event):
         key = event.keyval
         self.sim_area.on_key_up(event)
-
-    def on_mouse(self, widget, event):
-        print "("+str(event.x)+","+str(event.y)+")"
     #####TEMP METHODS?######END
 
 class MortarShot:

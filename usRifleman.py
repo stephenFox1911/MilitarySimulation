@@ -11,15 +11,15 @@ class USrifleman(Soldier):
         
 
     def observe(self):
-        Soldier.observe(self)
+        return Soldier.observe(self)
 
     def decide(self):
-        Soldier.decide(self)
-    
+        return Soldier.decide(self)
+
     def act(self):
-        Soldier.act(self)
+        return Soldier.act(self)
 
     def displaySoldier(self):
-        Soldier.displaySoldier(self)
+        return Soldier.displaySoldier(self)
 
 
