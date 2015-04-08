@@ -7,7 +7,9 @@ import math
 import glib
 from soldier import Soldier
 from usRifleman import USrifleman
+from usMachineGunner import USmachineGunner
 from talibanRifleman import TalibanRifleman
+from usFireteamLeader import USfireteamLeader
 from shotline import ShotLine
 from cover import Cover
 import csv
@@ -140,8 +142,16 @@ class SimArea(gtk.DrawingArea):
         self.inSim = True
 
         for i,line in enumerate(input_list):
-            if line[0] == 'blue':
-                blue = USrifleman("soldier"+str(i), line[0], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+            if line[0] == 'bluer':
+                blue = USrifleman("soldier"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
+                self.blue_combatants.append(blue)
+            elif line[1] == 'bluem':
+                blue = USmachineGunner("soldier"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
+                blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
+                self.blue_combatants.append(blue)
+            elif line[1] == 'bluef':
+                blue = USfireteamLeader("soldier"+str(i), line[0][:-1], int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5]))
                 blue.updateObjective(self.objectives[0][0], self.objectives[0][1])
                 self.blue_combatants.append(blue)
             elif line[0] == 'red':
@@ -163,14 +173,14 @@ class SimArea(gtk.DrawingArea):
             pixbuf = gtk.gdk.pixbuf_new_from_file('GUI/bg.png')
             widget.window.draw_pixbuf(widget.style.bg_gc[gtk.STATE_NORMAL], pixbuf, 0, 0, 0,0)
 
-            for red in self.red_combatants:
-                self.draw_red_soldiers(cr, red)
-            for blue in self.blue_combatants:
-                self.draw_blue_soldiers(cr, blue)
             for red in self.red_casualties:
                 self.draw_red_casualties(cr, red)
             for blue in self.blue_casualties:
                 self.draw_blue_casualties(cr, blue)
+            for red in self.red_combatants:
+                self.draw_red_soldiers(cr, red)
+            for blue in self.blue_combatants:
+                self.draw_blue_soldiers(cr, blue)
             for mortar in self.mortars: #TODO check implementation with Wayne
                 self.draw_mortars(cr, mortar)
             for shot in self.shots:
