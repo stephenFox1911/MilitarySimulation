@@ -40,7 +40,8 @@ class SimArea(gtk.DrawingArea):
         self.mortar = None
         self.mortar_rate_of_fire = None
         self.count = 0
-        self.objectives = [(741,670), (799,153)]
+        #self.objectives = [(741,670), (799,153)]
+        self.objectives = [(741,670), (700,153)]
         #self.objectives = [(750,350), (0,0)]
         self.reached_turn = False
         self.danger_close = False
@@ -63,6 +64,9 @@ class SimArea(gtk.DrawingArea):
         #called for each tick of the simulation
         #print self.count
         if self.inSim:
+            if len(self.red_combatants) == 0 or len(self.blue_combatants) == 0:
+                self.inSim == False
+                return True
             #check simulation processes
             if self.count%20 == 0:
                 #randomly shuffle combatants for decision making process
@@ -73,7 +77,7 @@ class SimArea(gtk.DrawingArea):
                 self.act()
             self.updateSoldiers()
             self.checkObjectives()
-            if self.mortar is not None and not self.danger_close and self.count%self.mortar_rate_of_fire==0:
+            if self.mortar is not None and not self.danger_close and self.count%self.mortar_rate_of_fire==0 and self.mortar.currentAmmo > 0:
                 landingX, landingY = self.mortar.attack(self.objectives[1])
                 shot = MortarShot(landingX, landingY)
                 self.mortar_shots.append(shot)
@@ -102,7 +106,7 @@ class SimArea(gtk.DrawingArea):
                 d = math.hypot(blue.posx - blue.objectiveX, blue.posy - blue.objectiveY)
                 if d < 40:
                     count += 1
-            if count >= 7:
+            if count >= len(self.blue_combatants)*0.4:
                 self.reached_turn = True
         if self.reached_turn and not self.danger_close:
             for blue in self.blue_combatants:
