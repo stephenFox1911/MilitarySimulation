@@ -29,7 +29,7 @@ class TalibanMachineGunner(Soldier):
                 self.currentAction = "Cover"
         
         elif self.state == "Cover" :
-            if decisionInt >= 50 and len(self.enemyList) > 0 :
+            if decisionInt >= 30 and len(self.enemyList) > 0 :
                 self.state = "Engage"
                 #Logic for choosing different types of attacks goes here
                 self.currentAction = "MachineGunAttack"
@@ -38,7 +38,7 @@ class TalibanMachineGunner(Soldier):
                 self.currentAction = "Cover"
         
         elif self.state == "Engage" :
-            if decisionInt >= 50 and len(self.enemyList) > 0 :
+            if decisionInt >= 30 and len(self.enemyList) > 0 :
                 self.state = "Engage"
                 #Logic for choosing different types of attacks goes here
                 self.currentAction = "MachineGunAttack"
@@ -48,7 +48,7 @@ class TalibanMachineGunner(Soldier):
                 self.currentAction = "Cover"
         
         elif self.state == "Move" :
-            if decisionInt >= 50 and len(self.enemyList) > 0 :
+            if decisionInt >= 30 and len(self.enemyList) > 0 :
                 self.state = "Engage"
                 #Logic for choosing different types of attacks goes here
                 self.currentAction = "MachineGunAttack"

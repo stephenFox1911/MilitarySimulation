@@ -41,7 +41,7 @@ class SimArea(gtk.DrawingArea):
         self.mortar_rate_of_fire = None
         self.count = 0
         #self.objectives = [(741,670), (799,153)]
-        self.objectives = [(741,670), (700,153)]
+        self.objectives = [(671,593), (799,153)]
         #self.objectives = [(750,350), (0,0)]
         self.reached_turn = False
         self.danger_close = False
