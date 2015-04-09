@@ -14,8 +14,8 @@ class Mortar(object):
 
         #Adding error to intial landing position, which is posx and posy
         #If we want to we can change this to some other mathematical distribution
-        landingX = target[0] + random.randint(-10, 10)
-        landingY = target[1] + random.randint(-10, 10)
+        landingX = target[0] + random.randint(-20, 20)
+        landingY = target[1] + random.randint(-20, 20)
 
         # #Actual radius of mortar damage; r1 = dead; r2 = heavy; r3 = light
         # #7.5 foot radius
