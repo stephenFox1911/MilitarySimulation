@@ -14,7 +14,10 @@ class Cover:
         '''
         self.posx = x
         self.posy = y
-        self.quality = quality
+        if quality == 1:
+            self.quality = 45
+        elif quality == 0:
+            self.quality = 35
         self.occupancy = occupancy
         self.current_occupancy = 0
         self.passable = passable
