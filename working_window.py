@@ -309,9 +309,9 @@ class SimArea(gtk.DrawingArea):
         cr.stroke()
     def draw_red_soldiers(self, cr, red):
         if red.__class__.__name__ is 'TalibanRifleman':
-            self.draw_red_rifle(cr, blue)
-        elif blue.__class__.__name__ is 'TalibanMachineGunner':
-            self.draw_red_mg(cr, blue)
+            self.draw_red_rifle(cr, red)
+        elif red.__class__.__name__ is 'TalibanMachineGunner':
+            self.draw_red_mg(cr, red)
         else:
             assert False, 'Type checking of soldiers is not working'
     def draw_red_rifle(self, cr, red):
