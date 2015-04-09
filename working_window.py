@@ -101,15 +101,8 @@ class SimArea(gtk.DrawingArea):
 
     def checkObjectives(self):
         for blue in self.blue_combatants:
-            count = 0
-            if not self.reached_turn:
-                d = math.hypot(blue.posx - blue.objectiveX, blue.posy - blue.objectiveY)
-                if d < 40:
-                    count += 1
-            if count >= len(self.blue_combatants)*0.4:
-                self.reached_turn = True
-        if self.reached_turn and not self.danger_close:
-            for blue in self.blue_combatants:
+            d = math.hypot(blue.posx - blue.objectiveX, blue.posy - blue.objectiveY)
+            if d < 60:
                 blue.updateObjective(self.objectives[1][0], self.objectives[1][1])
         if self.danger_close:
             pass
