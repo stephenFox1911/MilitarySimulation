@@ -205,31 +205,8 @@ class Soldier:
             print self.name + " Move"
             self.coverQuality = 0
             self.isVisible = True
-            coverRank = float("inf")
-            bestCover = None
-            #approximately 5 yards
-            FIRETEAM_IDEAL_DISTANCE = 30
-            friendScore = 0
-            #will choose cover with lowest score
-            for c in self.closestCover:
-                if c is None :
-                    continue
-                for s in Soldier.soldiers :
-                    if s.fireteam == self.fireteam and s.team == self.team :
-                        #find distance between fireteam member and cover
-                        dist = math.hypot(c.center[0] - s.posx, c.center[1] - s.posy)
-                        if dist >= FIRETEAM_IDEAL_DISTANCE :
-                            friendScore += dist - FIRETEAM_IDEAL_DISTANCE
-                        else :
-                            friendScore += FIRETEAM_IDEAL_DISTANCE - dist
-                #get distance
-                score = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)
-                score -= 3*c.quality
-                score += 10*c.current_occupancy
-                score += friendScore
-                if c.cover_available and score < coverRank and not c.in_cover(self.posx, self.posy):
-                    bestCover = c
-                    coverRank = score
+            
+            bestCover = self.closestCover[randint(0,len(self.closestCover)-1)]
 
             Soldier.output.write(self.name + "- Moving to Cover \n")
             #cover decision has been made, now orient and move towards it
@@ -277,10 +254,11 @@ class Soldier:
     def update(self):
         if self.state == "Move":
             distance = math.hypot(self.targetCover.posx - self.posx, self.targetCover.posy - self.posy)
-            if distance < self.moveSpeed/20: #TODO change from magic number
+            if distance < self.moveSpeed/20 and self.targetCover.current_occupancy < self.targetCover.occupancy: #TODO change from magic number
                 self.posx, self.posy = self.targetCover.center
                 self.coverQuality = self.targetCover.quality
                 self.state = "Cover"
+                self.targetCover.current_occupancy += 1
                 self.targetCover = None
             else :
                 dx = self.posx - self.targetCover.posx
@@ -297,8 +275,8 @@ class Soldier:
     def findCover(self, coverList):
         Soldier.output.write(self.name + " Looking for Cover\n")
         #returns the three closest pieces of cover
-        minDistances = [99999, 99998, 99997, 99996]
-        closeCover = [None, None, None, None]
+        minDistances = [99999, 99998, 99997, 99996, 99995, 99994, 99993, 99992]
+        closeCover = [None, None, None, None, None, None, None, None]
         
         for c in coverList:
             coverDistance = math.hypot(c.center[0] - self.objectiveX, c.center[1] - self.objectiveY)
@@ -310,4 +288,37 @@ class Soldier:
                 index = minDistances.index(currentMax)
                 minDistances[index] = distance
                 closeCover[index] = c
-        self.closestCover = closeCover
+
+        bestCover = []
+        scoreList = []
+        #approximately 5 yards
+        FIRETEAM_IDEAL_DISTANCE = 30
+        friendScore = 0
+        #will choose cover with lowest score
+        for c in closeCover:
+            if c is None :
+                continue
+            if c.posx == self.posx and c.posy == self.posy :
+                bestCover.append((c, 0))
+            for s in Soldier.soldiers :
+                if s.fireteam == self.fireteam and s.team == self.team and not s.isDead:
+                    #find distance between fireteam member and cover
+                    dist = math.hypot(c.center[0] - s.posx, c.center[1] - s.posy)
+                    if dist >= FIRETEAM_IDEAL_DISTANCE :
+                        friendScore += dist - FIRETEAM_IDEAL_DISTANCE
+                    else :
+                        friendScore += FIRETEAM_IDEAL_DISTANCE - dist
+            #get distance
+            score = math.hypot(c.center[0] - self.posx, c.center[1] - self.posy)/60
+            score -= 3*c.quality
+            score += 20*c.current_occupancy
+            score += friendScore
+            if c.cover_available and not c.in_cover(self.posx, self.posy) and (len(bestCover) < 4 or score < max(scoreList)):
+                if len(bestCover) < 4 :
+                    bestCover.append((c, score))
+                    scoreList = [tup[1] for tup in bestCover]
+                else:
+                    scoreList = [tup[1] for tup in bestCover]
+                    scoreList[scoreList.index(max(scoreList))] = (c, score)
+
+        self.closestCover = [tup[0] for tup in bestCover]
