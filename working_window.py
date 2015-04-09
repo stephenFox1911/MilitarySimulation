@@ -37,9 +37,11 @@ class SimArea(gtk.DrawingArea):
         self.shots = [] #list of all active ShotLine objects
         self.mortar_shots = []
         self.cover_objects = []
+        self.mortar = None
+        self.mortar_rate_of_fire = None
         self.count = 0
-        #self.objectives = [(741,670), (799,153)]
-        self.objectives = [(750,350), (0,0)]
+        self.objectives = [(741,670), (799,153)]
+        #self.objectives = [(750,350), (0,0)]
         self.reached_turn = False
         self.danger_close = False
         ######TEMP VARIABLES#####START
@@ -71,7 +73,21 @@ class SimArea(gtk.DrawingArea):
                 self.act()
             self.updateSoldiers()
             self.checkObjectives()
-
+            if self.mortar is not None and not self.danger_close and self.count%self.mortar_rate_of_fire==0:
+                landingX, landingY = self.mortar.attack(self.objectives[1])
+                shot = MortarShot(landingX, landingY)
+                self.mortar_shots.append(shot)
+                for red in self.red_combatants:
+                    d = math.sqrt(math.pow((red.posx - landingX),2) + math.pow((red.posy - landingY),2))
+                    if d <= 30:
+                        red.isDead = True
+                        self.red_casualties.append(red)
+                        #TODO here, target is removed before this is executed. seems to be tied with multiple successful hits
+                        self.red_combatants.remove(red)
+                    if d >30 and d <=90:
+                        red.suppression += 90
+                    if d >90 and d <=300:
+                        red.suppression += 50
             self.queue_draw() #gtk function to draw all queued changes
             self.count += 1
             return True
@@ -161,6 +177,9 @@ class SimArea(gtk.DrawingArea):
                 self.red_combatants.append(TalibanRifleman("Red Rifleman"+str(i), "red", int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
             elif line[0] == 'redm':
                 self.red_combatants.append(TalibanMachineGunner("Red MachineGunner"+str(i), "red", int(line[1]), int(line[2]), int(line[3]), int(line[4]), int(line[5])))
+            elif line[0] == 'mortar':
+                self.mortar = Mortar(int(line[1]), int(line[2]))
+                self.mortar_rate_of_fire = self.mortar.fireRate#TODO add conversion logic
             elif line[0] == 'cover':
                 self.cover_objects.append(Cover(int(line[1]), int(line[2]), int(line[3]), int(line[4])))
             else:
@@ -189,27 +208,28 @@ class SimArea(gtk.DrawingArea):
             for mortar in self.mortars: #TODO check implementation with Wayne
                 self.draw_mortars(cr, mortar)
             for shot in self.shots:
-                cr.set_line_width(2)
+                cr.set_line_width(1)
                 if shot.hit:
                     cr.set_source_rgba(0, 0, 0, shot.alpha) #shot is black if hit
                 else:
                     cr.set_source_rgba(1, 1, 1, shot.alpha) #white if miss
                 cr.move_to(shot.source_x, shot.source_y)
                 cr.line_to(shot.target_x, shot.target_y)
+                cr.arc(shot.target_x, shot.target_y, 7, 0, math.pi*2)
                 cr.stroke()
                 shot.degrade() #increases the transparency for future ticks
             self.shots = [shot for shot in self.shots if shot.alpha > 0]
             for shot in self.mortar_shots:
                 if shot.detonate:
                     cr.set_source_rgba(1,1,1,0.25)
-                    cr.arc(shot.posx, shot.posy, 50, 0, 2*math.pi) #TODO change 5 to proper distance -- implement in mortarshot?
+                    cr.arc(shot.posx, shot.posy, 300, 0, 2*math.pi) #TODO change 5 to proper distance -- implement in mortarshot?
                     cr.fill()
                     #cr.set_source_rgba(0, 0, 0, 0.25)
                     cr.set_source_rgba(1,1,1,0.35)
-                    cr.arc(shot.posx, shot.posy, 15, 0, 2*math.pi)
+                    cr.arc(shot.posx, shot.posy, 90, 0, 2*math.pi)
                     cr.fill()
                     cr.set_source_rgba(1,1,1,0.6)
-                    cr.arc(shot.posx, shot.posy, 5, 0, 2*math.pi)
+                    cr.arc(shot.posx, shot.posy, 30, 0, 2*math.pi)
                     cr.fill()
                 else:
                     cr.set_line_width(1)
@@ -221,7 +241,9 @@ class SimArea(gtk.DrawingArea):
                 shot.update()
             self.mortar_shots = [shot for shot in self.mortar_shots if shot.detonation_time > 0]
             for cover in self.cover_objects:
-                pass #TODO implement
+                cr.set_source_rgb(0,1,0)
+                cr.arc(cover.posx, cover.posy, 3, 0, math.pi*2)
+                cr.stroke()
         else:
             self.sim_over(cr)
 
@@ -338,14 +360,14 @@ class Simulation(gtk.Window):
             print "("+str(event.x)+","+str(event.y)+")"
         else:
             key = event.keyval
-            self.sim_area.on_key_down(event)
 
     def on_mouse(self, widget, event):
         print "("+str(event.x)+","+str(event.y)+")"
     #####TEMP METHODS?######END
 
 class MortarShot:
-    def __init__(self, s_x, s_y, t_x, t_y):
+    #def __init__(self, s_x, s_y, t_x, t_y):
+    def __init__(self, t_x, t_y):
         '''
         @summary: a class to hold data for each mortar shot fired
         @param source_x: the x-coord for the source mortar
@@ -353,21 +375,23 @@ class MortarShot:
         @param target_x: the x-coord for the target point
         @param target_y: the y-coord for the target point
         '''
-        self.detonate = False #whether or not the mortar shot has detonated
+        self.detonate = True #whether or not the mortar shot has detonated
         self.detonation_time = 1500 #1.5 seconds for explosion animation
-        self.posx = s_x #x-position of mortar shot
-        self.posy = s_y #y-position of mortar shot
-        self.t_x = t_x #x-position of mortar target
-        self.t_y = t_y #y-position of mortar target
-        self.time_in_air = 20000
-        dx = s_x - t_x
-        dy = s_y - t_y
-        dist = math.hypot(dx, dy)
-        ticks_in_air = self.time_in_air / TIME_BETWEEN_FRAMES
-        magnitude = dist / ticks_in_air
-        theta = math.atan2(dy, dx)
-        self.delta_x = math.cos(theta) * magnitude
-        self.delta_y = math.sin(theta) * magnitude
+        #self.posx = s_x #x-position of mortar shot
+        #self.posy = s_y #y-position of mortar shot
+        #self.t_x = t_x #x-position of mortar target
+        #self.t_y = t_y #y-position of mortar target
+        self.posx = t_x
+        self.posy = t_y
+        #self.time_in_air = 20000
+        # dx = s_x - t_x
+        # dy = s_y - t_y
+        # dist = math.hypot(dx, dy)
+        # ticks_in_air = self.time_in_air / TIME_BETWEEN_FRAMES
+        # magnitude = dist / ticks_in_air
+        # theta = math.atan2(dy, dx)
+        # self.delta_x = math.cos(theta) * magnitude
+        # self.delta_y = math.sin(theta) * magnitude
 
     def update(self):
         if not self.detonate:
