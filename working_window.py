@@ -240,10 +240,10 @@ class SimArea(gtk.DrawingArea):
                     cr.fill()
                 shot.update()
             self.mortar_shots = [shot for shot in self.mortar_shots if shot.detonation_time > 0]
-            for cover in self.cover_objects:
-                cr.set_source_rgb(0,1,0)
-                cr.arc(cover.posx, cover.posy, 3, 0, math.pi*2)
-                cr.stroke()
+            #for cover in self.cover_objects:
+                #cr.set_source_rgb(0,1,0)
+                #cr.arc(cover.posx, cover.posy, 3, 0, math.pi*2)
+                #cr.stroke()
         else:
             self.sim_over(cr)
 
