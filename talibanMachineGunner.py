@@ -20,7 +20,7 @@ class TalibanMachineGunner(Soldier):
         decisionInt = randint(0,100) + self.aggression - self.suppression
         
         if self.state == "Neutral" :        
-            if decisionInt >= 50 and len(self.enemyList) > 0 :
+            if decisionInt >= 300 and len(self.enemyList) > 0 :
                 self.state = "Engage"
                 #Logic for choosing different types of attacks goes here
                 self.currentAction = "MachineGunAttack"                    

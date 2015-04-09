@@ -80,7 +80,7 @@ class Soldier:
         
         if self.state == "Neutral" :        
             # 30% chance that the soldier chooses to attack (before modifiers)
-            if decisionInt >= 50 and len(self.enemyList) > 0 :
+            if decisionInt >= 300 and len(self.enemyList) > 0 :
                 self.state = "Engage"
                 #Logic for choosing different types of attacks goes here
                 self.currentAction = "SimpleAttack"

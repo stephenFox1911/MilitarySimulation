@@ -70,7 +70,6 @@ class USfireteamLeader(Soldier):
                 score += 10*c.current_occupancy
                 if c.cover_available and score < coverRank:
                     bestCover = c
-            Soldier.output.write("Moving to Cover at Xval: " + str(bestCover.center[0]) + "Yval: " + str(bestCover.center[1]) + "\n")
             #cover decision has been made, now orient and move towards it
             diffX = self.posx - bestCover.center[0]
             diffY = self.posy - bestCover.center[1]
