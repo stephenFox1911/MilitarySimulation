@@ -259,6 +259,15 @@ class SimArea(gtk.DrawingArea):
 
     '''///////////DRAW METHODS///////////'''
     def draw_blue_soldiers(self, cr, blue):
+        if blue.__class__.__name__ is 'USrifleman':
+            self.draw_blue_rifle(cr, blue)
+        elif blue.__class__.__name__ is 'USmachineGunner':
+            self.draw_blue_mg(cr, blue)
+        elif blue.__class__.__name__ is 'USfireteamLeader':
+            self.draw_blue_ftl(cr, blue)
+        else:
+            assert False, 'Type checking of soldiers is not working'
+    def draw_blue_rifle(self, cr, blue):
         cr.set_line_width(1)
         cr.set_source_rgb(0, 0, 0)
         cr.arc(blue.posx, blue.posy, 5, 0, 2*math.pi)
@@ -271,7 +280,41 @@ class SimArea(gtk.DrawingArea):
         cr.line_to(blue.posx + (5*math.cos(orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
         cr.set_line_width(2)
         cr.stroke()
+    def draw_blue_mg(self, cr, blue):
+        cr.set_line_width(1)
+        cr.set_source_rgb(0, 0, 0)
+        cr.arc(blue.posx, blue.posy, 5, 0, 2*math.pi)
+        cr.stroke_preserve()
+        cr.set_source_rgb(0, 0, 1)
+        cr.fill()
+        cr.set_source_rgb(0, 0, 0)
+        cr.move_to(blue.posx, blue.posy)
+        orientation = (blue.orientation + 2) % 7
+        cr.set_source_rgb(1, 1, 1)
+        cr.line_to(blue.posx + (5*math.cos(orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
+        cr.set_line_width(2)
+        cr.stroke()
+    def draw_blue_ftl(self, cr, blue):
+        cr.set_line_width(1)
+        cr.set_source_rgb(1, 1, 1)
+        cr.arc(blue.posx, blue.posy, 5, 0, 2*math.pi)
+        cr.stroke_preserve()
+        cr.set_source_rgb(0, 0, 1)
+        cr.fill()
+        cr.set_source_rgb(0, 0, 0)
+        cr.move_to(blue.posx, blue.posy)
+        orientation = (blue.orientation + 2) % 7
+        cr.line_to(blue.posx + (5*math.cos(orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
+        cr.set_line_width(2)
+        cr.stroke()
     def draw_red_soldiers(self, cr, red):
+        if red.__class__.__name__ is 'TalibanRifleman':
+            self.draw_red_rifle(cr, blue)
+        elif blue.__class__.__name__ is 'TalibanMachineGunner':
+            self.draw_red_mg(cr, blue)
+        else:
+            assert False, 'Type checking of soldiers is not working'
+    def draw_red_rifle(self, cr, red):
         cr.set_line_width(1) #border width
         cr.set_source_rgb(0, 0, 0) #border color black
         cr.arc(red.posx, red.posy, 5, 0, 2*math.pi) #border shape and position (circle)
@@ -279,6 +322,19 @@ class SimArea(gtk.DrawingArea):
         cr.set_source_rgb(1, 0, 0) #set color to red
         cr.fill() #fill border
         cr.set_source_rgb(0, 0, 0) #set color to black
+        cr.move_to(red.posx, red.posy) #move to center of circle
+        orientation = (red.orientation + 2) % 7
+        cr.line_to(red.posx + (5*math.cos(orientation*math.pi/4)), red.posy + (5*math.sin(-orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
+        cr.set_line_width(2)
+        cr.stroke() #draw line indicating soldier orientation
+    def draw_red_mg(self, cr, red):
+        cr.set_line_width(1) #border width
+        cr.set_source_rgb(0, 0, 0) #border color black
+        cr.arc(red.posx, red.posy, 5, 0, 2*math.pi) #border shape and position (circle)
+        cr.stroke_preserve() #draw border
+        cr.set_source_rgb(1, 0, 0) #set color to red
+        cr.fill() #fill border
+        cr.set_source_rgb(1, 1, 1) #set color to black
         cr.move_to(red.posx, red.posy) #move to center of circle
         orientation = (red.orientation + 2) % 7
         cr.line_to(red.posx + (5*math.cos(orientation*math.pi/4)), red.posy + (5*math.sin(-orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
