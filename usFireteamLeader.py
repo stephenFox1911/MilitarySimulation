@@ -26,20 +26,36 @@ class USfireteamLeader(Soldier):
             print self.name + " Simple Attack"
 
             isShot = True
+            self.isVisible = True
             self.coverQuality -= 10
             #Finds target with least amount of cover and fires one shot
-            worstCover = 1000
+            worstScore = float("inf")
             
             for enemy in self.enemyList :
-                if enemy.coverQuality <= worstCover :
-                    target = enemy
+                distance = math.hypot(enemy.posx - self.posx, enemy.posy - self.posy)
+                if distance < 120 :
+                    if (enemy.coverQuality + distance/60) <= worstScore and not enemy.isDead :
+                        target = enemy  
+                else :  
+                    if (enemy.coverQuality + distance/60) <= worstScore and not enemy.isDead and enemy.isVisible:
+                        target = enemy
             
-            #Attack enemy 3 times
-            shotQuality = 50
-            Soldier.output.write("Simple Attack: TARGET: " + target.name + " \n")
-            for x in xrange(1,3):
-                if self.attack(target, shotQuality) :
-                    shotSuccess = True
+            if target is None :
+                isShot = False
+                self.currentAction = "Move"
+                self.state = "Move"
+                self.act()
+            else:
+                #Attack enemy 3 times
+                shotQuality = 50
+                Soldier.output.write(self.name + "- Simple Attack: TARGET: " + target.name)
+                for x in xrange(1,4):
+                    if self.attack(target, shotQuality) :
+                        shotSuccess = True
+                if shotSuccess :
+                    Soldier.output.write(": Successful Hit\n")
+                else : 
+                    Soldier.output.write(": Shot Missed\n")
 
         elif self.currentAction == "Move" :
             print self.name + " Move"
