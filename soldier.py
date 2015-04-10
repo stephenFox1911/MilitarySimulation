@@ -92,7 +92,6 @@ class Soldier:
             elif decisionInt >= 35 :
                 self.state = "Move"
                 self.currentAction = "Move"
-                    
             else :
                 self.state = "Cover"
                 self.currentAction = "Cover"
@@ -266,7 +265,6 @@ class Soldier:
         Soldier.output.write(out)
     
     def findCover(self, coverList):
-        Soldier.output.write(self.name + " Looking for Cover\n")
         #returns the three closest pieces of cover
         minDistances = [99999, 99998, 99997, 99996, 99995, 99994, 99993, 99992]
         closeCover = [None, None, None, None, None, None, None, None]
