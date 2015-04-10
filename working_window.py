@@ -86,12 +86,11 @@ class SimArea(gtk.DrawingArea):
                     if d <= 30:
                         red.isDead = True
                         self.red_casualties.append(red)
-                        #TODO here, target is removed before this is executed. seems to be tied with multiple successful hits
-                        self.red_combatants.remove(red)
                     if d >30 and d <=90:
-                        red.suppression += 90
-                    if d >90 and d <=300:
-                        red.suppression += 50
+                        red.suppression += 60#90
+                    # if d >90 and d <=300:
+                    #     red.suppression += 50
+                self.red_combatants = [red for red in self.red_combatants if not red.isDead]
             self.queue_draw() #gtk function to draw all queued changes
             self.count += 1
             return True
@@ -122,27 +121,38 @@ class SimArea(gtk.DrawingArea):
             red.decide()
         for blue in self.blue_combatants:
             blue.decide()
-        # for mortar in self.mortars:
-        #     mortar.decide() #TODO IS THIS IMPLEMENTED
 
     def act(self):
         for red in self.red_combatants:
-            isShot, target, shotSuccess = red.act()
+            isShot, target, shotSuccess, misses = red.act()
             if isShot:
-                self.shots.append(ShotLine(red.posx, red.posy, target.posx, target.posy, shotSuccess))
                 if shotSuccess:
+                    self.shots.append(ShotLine(red.posx, red.posy, target.posx, target.posy, shotSuccess))
                     self.blue_casualties.append(target)
                     self.blue_combatants.remove(target)
+                for i in xrange(misses):
+                    dx = red.posx - target.posx
+                    dy = red.posy - target.posy
+                    dist = math.hypot(dx, dy)
+                    theta = math.atan2(dy, dx) + random.gauss(0,0.01)
+                    new_x = -math.cos(theta) * dist + red.posx
+                    new_y = -math.sin(theta) * dist + red.posy
+                    self.shots.append(ShotLine(red.posx, red.posy, new_x, new_y, False))
         for blue in self.blue_combatants:
-            isShot, target, shotSuccess = blue.act()
+            isShot, target, shotSuccess, misses = blue.act()
             if isShot:
-                self.shots.append(ShotLine(blue.posx, blue.posy, target.posx, target.posy, shotSuccess))
                 if shotSuccess:
+                    self.shots.append(ShotLine(blue.posx, blue.posy, target.posx, target.posy, shotSuccess))
                     self.red_casualties.append(target)
-                    #TODO here, target is removed before this is executed. seems to be tied with multiple successful hits
                     self.red_combatants.remove(target)
-        # for mortar in self.mortars:
-        #     mortar.act() #TODO IS THIS IMPLEMENTED
+                for i in xrange(misses):
+                    dx = blue.posx - target.posx
+                    dy = blue.posy - target.posy
+                    dist = math.hypot(dx, dy)
+                    theta = math.atan2(dy, dx) + random.gauss(0,0.01)
+                    new_x = -math.cos(theta) * dist + blue.posx
+                    new_y = -math.sin(theta) * dist + blue.posy
+                    self.shots.append(ShotLine(blue.posx, blue.posy, new_x, new_y, False))
 
     def updateSoldiers(self):
         for red in self.red_combatants:
@@ -202,7 +212,7 @@ class SimArea(gtk.DrawingArea):
                 self.draw_red_soldiers(cr, red)
             for blue in self.blue_combatants:
                 self.draw_blue_soldiers(cr, blue)
-            for mortar in self.mortars: #TODO check implementation with Wayne
+            for mortar in self.mortars:
                 self.draw_mortars(cr, mortar)
             for shot in self.shots:
                 cr.set_line_width(1)
@@ -212,15 +222,16 @@ class SimArea(gtk.DrawingArea):
                     cr.set_source_rgba(1, 1, 1, shot.alpha) #white if miss
                 cr.move_to(shot.source_x, shot.source_y)
                 cr.line_to(shot.target_x, shot.target_y)
-                cr.arc(shot.target_x, shot.target_y, 7, 0, math.pi*2)
+                if shot.hit:
+                    cr.arc(shot.target_x, shot.target_y, 7, 0, math.pi*2)
                 cr.stroke()
                 shot.degrade() #increases the transparency for future ticks
             self.shots = [shot for shot in self.shots if shot.alpha > 0]
             for shot in self.mortar_shots:
                 if shot.detonate:
                     cr.set_source_rgba(1,1,1,0.25)
-                    cr.arc(shot.posx, shot.posy, 300, 0, 2*math.pi) #TODO change 5 to proper distance -- implement in mortarshot?
-                    cr.fill()
+                    #cr.arc(shot.posx, shot.posy, 300, 0, 2*math.pi) #TODO change 5 to proper distance -- implement in mortarshot?
+                    #cr.fill()
                     #cr.set_source_rgba(0, 0, 0, 0.25)
                     cr.set_source_rgba(1,1,1,0.35)
                     cr.arc(shot.posx, shot.posy, 90, 0, 2*math.pi)
