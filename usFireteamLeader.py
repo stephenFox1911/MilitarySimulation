@@ -21,6 +21,7 @@ class USfireteamLeader(Soldier):
         isShot = False
         target = None
         shotSuccess = False
+        misses = 0
 
         if self.currentAction == "SimpleAttack" :
             print self.name + " Simple Attack"
@@ -52,6 +53,8 @@ class USfireteamLeader(Soldier):
                 for x in xrange(1,4):
                     if self.attack(target, shotQuality) :
                         shotSuccess = True
+                    else:
+                        misses += 1
                 if shotSuccess :
                     Soldier.output.write(": Successful Hit\n")
                 else : 
@@ -104,7 +107,7 @@ class USfireteamLeader(Soldier):
             if not inCover :
                 self.coverQuality = 20
             Soldier.output.write("Taking Cover, Quality = " + str(self.coverQuality) + "\n")
-        return (isShot, target, shotSuccess)
+        return (isShot, target, shotSuccess, misses)
         
     def displaySoldier(self):
         Soldier.displaySoldier(self)

@@ -130,6 +130,7 @@ class Soldier:
         isShot = False
         target = None
         shotSuccess = False
+        misses = 0
 
         if self.currentAction == "SimpleAttack" :
             print self.name + " Simple Attack"
@@ -161,6 +162,8 @@ class Soldier:
                 for x in xrange(1,4):
                     if self.attack(target, shotQuality) :
                         shotSuccess = True
+                    else:
+                        misses += 1
                 if shotSuccess :
                     Soldier.output.write(": Successful Hit\n")
                 else : 
@@ -189,6 +192,8 @@ class Soldier:
                 for x in xrange(1,10):
                     if self.attack(target, shotQuality) :
                         shotSuccess = True
+                    else:
+                        misses += 1
 
         elif self.currentAction == "Move" :
             print self.name + " Move"
@@ -238,7 +243,7 @@ class Soldier:
             Soldier.output.write(self.name + "- Taking Cover, Quality = " + str(self.coverQuality) + "\n")
 
         random.shuffle(Soldier.soldiers)
-        return (isShot, target, shotSuccess)
+        return (isShot, target, shotSuccess, misses)
 
     def update(self):
         if self.state == "Move":
