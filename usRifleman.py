@@ -10,7 +10,6 @@ class USrifleman(Soldier):
         # subclass specific arguments go here
         Soldier.__init__(self, name, team, fireteam, posx, posy, orientation, aggression)
         
-
     def observe(self):
         return Soldier.observe(self)
 
