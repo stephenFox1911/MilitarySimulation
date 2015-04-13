@@ -443,7 +443,7 @@ class MortarShot:
         @param target_y: the y-coord for the target point
         '''
         self.detonate = True #whether or not the mortar shot has detonated
-        self.detonation_time = 1500 #1.5 seconds for explosion animation
+        self.detonation_time = 15 * TIME_BETWEEN_FRAMES #1.5 seconds for explosion animation
         #self.posx = s_x #x-position of mortar shot
         #self.posy = s_y #y-position of mortar shot
         #self.t_x = t_x #x-position of mortar target
