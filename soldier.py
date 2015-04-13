@@ -238,7 +238,7 @@ class Soldier:
                     self.isVisible = False
             #if there is no cover, the soldier goes prone
             if not inCover :
-                Soldier.output.write("Laying Down\n")
+                Soldier.output.write(self.name+" Laying Down\n")
                 self.coverQuality = 20
             Soldier.output.write(self.name + "- Taking Cover, Quality = " + str(self.coverQuality) + "\n")
 

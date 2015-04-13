@@ -63,9 +63,11 @@ class SimArea(gtk.DrawingArea):
     def on_timer(self):
         #called for each tick of the simulation
         #print self.count
+        Soldier.output.write("Tick Number: "+str(self.count)+"\n")
         if self.inSim:
             if len(self.red_combatants) == 0 or len(self.blue_combatants) == 0:
                 self.inSim == False
+                Soldier.output.write("END SIM")
                 return True
             #check simulation processes
             if self.count%20 == 0:
@@ -86,6 +88,7 @@ class SimArea(gtk.DrawingArea):
                     if d <= 30:
                         red.isDead = True
                         self.red_casualties.append(red)
+                        Soldier.output.write("Mortar strike killed "+red.name+"\n")
                     if d >30 and d <=90:
                         red.suppression += 60#90
                     # if d >90 and d <=300:
@@ -287,8 +290,8 @@ class SimArea(gtk.DrawingArea):
         cr.fill()
         cr.set_source_rgb(0, 0, 0)
         cr.move_to(blue.posx, blue.posy)
-        orientation = (blue.orientation + 2) % 7
-        cr.line_to(blue.posx + (5*math.cos(orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
+        orientation = (blue.orientation - 2)
+        cr.line_to(blue.posx + (5*math.cos(orientation*-math.pi/4)), blue.posy + (5*math.sin(-orientation*-math.pi/4)))
         cr.set_line_width(2)
         cr.stroke()
     def draw_blue_mg(self, cr, blue):
@@ -300,9 +303,9 @@ class SimArea(gtk.DrawingArea):
         cr.fill()
         cr.set_source_rgb(0, 0, 0)
         cr.move_to(blue.posx, blue.posy)
-        orientation = (blue.orientation + 2) % 7
+        orientation = (blue.orientation - 2)
         cr.set_source_rgb(1, 1, 1)
-        cr.line_to(blue.posx + (5*math.cos(orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
+        cr.line_to(blue.posx + (5*math.cos(orientation*-math.pi/4)), blue.posy + (5*math.sin(-orientation*-math.pi/4)))
         cr.set_line_width(2)
         cr.stroke()
     def draw_blue_ftl(self, cr, blue):
@@ -314,8 +317,8 @@ class SimArea(gtk.DrawingArea):
         cr.fill()
         cr.set_source_rgb(0, 0, 0)
         cr.move_to(blue.posx, blue.posy)
-        orientation = (blue.orientation + 2) % 7
-        cr.line_to(blue.posx + (5*math.cos(orientation*math.pi/4)), blue.posy + (5*math.sin(-orientation*math.pi/4)))
+        orientation = (blue.orientation - 2)
+        cr.line_to(blue.posx + (5*math.cos(orientation*-math.pi/4)), blue.posy + (5*math.sin(-orientation*-math.pi/4)))
         cr.set_line_width(2)
         cr.stroke()
     def draw_red_soldiers(self, cr, red):
@@ -334,8 +337,8 @@ class SimArea(gtk.DrawingArea):
         cr.fill() #fill border
         cr.set_source_rgb(0, 0, 0) #set color to black
         cr.move_to(red.posx, red.posy) #move to center of circle
-        orientation = (red.orientation + 2) % 7
-        cr.line_to(red.posx + (5*math.cos(orientation*math.pi/4)), red.posy + (5*math.sin(-orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
+        orientation = (red.orientation - 2)
+        cr.line_to(red.posx + (5*math.cos(orientation*-math.pi/4)), red.posy + (5*math.sin(-orientation*-math.pi/4))) #create line from center of circle to border in direction of soldier orientation
         cr.set_line_width(2)
         cr.stroke() #draw line indicating soldier orientation
     def draw_red_mg(self, cr, red):
@@ -347,8 +350,8 @@ class SimArea(gtk.DrawingArea):
         cr.fill() #fill border
         cr.set_source_rgb(1, 1, 1) #set color to black
         cr.move_to(red.posx, red.posy) #move to center of circle
-        orientation = (red.orientation + 2) % 7
-        cr.line_to(red.posx + (5*math.cos(orientation*math.pi/4)), red.posy + (5*math.sin(-orientation*math.pi/4))) #create line from center of circle to border in direction of soldier orientation
+        orientation = (red.orientation - 2)
+        cr.line_to(red.posx + (5*math.cos(orientation*-math.pi/4)), red.posy + (5*math.sin(-orientation*-math.pi/4))) #create line from center of circle to border in direction of soldier orientation
         cr.set_line_width(2)
         cr.stroke() #draw line indicating soldier orientation
     def draw_blue_casualties(self, cr, blue):
