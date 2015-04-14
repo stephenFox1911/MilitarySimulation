@@ -19,7 +19,7 @@ import csv
 #Global Window Parameters
 WIDTH = 1128
 HEIGHT = 846
-TIME_BETWEEN_FRAMES = 100 #in milliseconds
+TIME_BETWEEN_FRAMES = 1 #in milliseconds
 
 class SimArea(gtk.DrawingArea):
 
@@ -63,14 +63,14 @@ class SimArea(gtk.DrawingArea):
     def on_timer(self):
         #called for each tick of the simulation
         #print self.count
-        Soldier.output.write("Tick Number: "+str(self.count)+"\n")
         if self.inSim:
             if len(self.red_combatants) == 0 or len(self.blue_combatants) == 0:
                 self.inSim == False
-                Soldier.output.write("END SIM")
+                #Soldier.output.write("END SIM")
                 return True
             #check simulation processes
             if self.count%20 == 0:
+                Soldier.output.write("Tick Number: "+str(self.count)+"\n")
                 #randomly shuffle combatants for decision making process
                 random.shuffle(self.red_combatants)
                 random.shuffle(self.blue_combatants)
@@ -90,7 +90,7 @@ class SimArea(gtk.DrawingArea):
                         self.red_casualties.append(red)
                         Soldier.output.write("Mortar strike killed "+red.name+"\n")
                     if d >30 and d <=90:
-                        red.suppression += 60#90
+                        red.suppression += 30#90
                     # if d >90 and d <=300:
                     #     red.suppression += 50
                 self.red_combatants = [red for red in self.red_combatants if not red.isDead]
